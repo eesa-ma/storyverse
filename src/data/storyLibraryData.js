@@ -6,6 +6,7 @@ export const STORY_LIBRARY = [
     title: "Dolly's Midnight Adventure",
     subtitle: "A story about curiosity, magical secrets, and helping lost friends",
     coverEmoji: "🎀✨",
+    coverImage: "/assets/dolly_cover_1790269637595.png",
     author: "Anushka",
     category: "Adventure & Science",
     badge: "🌟 Interactive Magical Quest",
@@ -22,6 +23,7 @@ export const STORY_LIBRARY = [
     title: "The Secret Cave",
     subtitle: "A story about true friendship, empathy, and sticking together",
     coverEmoji: "🐿️🌿",
+    coverImage: "/assets/cave_cover_1790269738675.png",
     author: "Anushka",
     category: "Friendship & Honesty",
     badge: "🌟 Interactive Choice Story",
@@ -38,6 +40,7 @@ export const STORY_LIBRARY = [
     title: "The Bottle That Waited",
     subtitle: "A story about care, empathy, and everyday helpers",
     coverEmoji: "💧",
+    coverImage: "/assets/bottle_cover_1790270437185.png",
     author: "Anushka",
     category: "Care & Empathy",
     badge: "🌟 Interactive Picture Story",
@@ -54,6 +57,7 @@ export const STORY_LIBRARY = [
     title: "The Little Rocket's Big Wish",
     subtitle: "A story about curiosity, dreams, and reaching for stars",
     coverEmoji: "🚀",
+    coverImage: "/assets/space_cover_1790269772353.png",
     author: "Anushka",
     category: "Adventure & Science",
     badge: "🌟 Interactive Space Quest",
@@ -70,6 +74,7 @@ export const STORY_LIBRARY = [
     title: "Benny Bear & The Magic Pencil",
     subtitle: "A story about sharing, creativity, and honesty",
     coverEmoji: "✏️",
+    coverImage: "/assets/bear_cover_1790270449665.png",
     author: "Anushka",
     category: "Friendship & Honesty",
     badge: "🌟 Interactive Art Adventure",
@@ -82,4 +87,5 @@ export const STORY_LIBRARY = [
     isAvailable: true
   }
 ];
+
 

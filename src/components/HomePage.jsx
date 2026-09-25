@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, Clock, Play, Star, PlusCircle } from 'lucide-react';
+import { BookOpen, Sparkles, Clock, Play, Search, Heart, Gamepad2, Users, ChevronDown, MoveRight, BookHeart, Compass, Handshake, BrainCircuit } from 'lucide-react';
 import { STORY_LIBRARY } from '../data/storyLibraryData';
 import { soundFX } from '../services/soundEffects';
 
-export default function HomePage({ onSelectStory = () => {} }) {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [buddyTalking, setBuddyTalking] = useState(false);
+export default function HomePage({ onSelectStory = () => { } }) {
+  const [selectedCategory, setSelectedCategory] = useState('All Stories');
 
-  const categories = ['All', 'Care & Empathy', 'Adventure & Science', 'Friendship & Honesty'];
+  const categories = ['All Stories', 'Care & Empathy', 'Adventure & Science', 'Friendship & Honesty'];
 
-  const filteredStories = selectedCategory === 'All'
+  const filteredStories = selectedCategory === 'All Stories'
     ? STORY_LIBRARY
     : STORY_LIBRARY.filter(s => s.category === selectedCategory);
-
-  const handleBuddyClick = () => {
-    soundFX.playSparkle();
-    setBuddyTalking(true);
-    setTimeout(() => setBuddyTalking(false), 3500);
-  };
 
   const handleStartStory = (story) => {
     if (story.isAvailable) {
@@ -29,250 +22,307 @@ export default function HomePage({ onSelectStory = () => {} }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-sky-200 via-pink-50 via-50% to-amber-100 text-slate-800 font-['Fredoka',sans-serif] selection:bg-pink-300 selection:text-pink-950 pb-28 overflow-x-hidden relative">
+    <div className="min-h-screen w-full bg-[#fbfdf9] text-slate-800 font-['Fredoka',sans-serif] selection:bg-sky-200 overflow-x-hidden relative">
 
-      {/* FLOATING PLAYFUL DECORATIONS (SUN, RAINBOW, CLOUDS, BALLOONS, STARS) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-12 -right-12 w-56 h-56 bg-amber-300/50 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-6 right-10 text-6xl opacity-90 animate-float">☀️</div>
-        <div className="absolute top-12 left-10 text-5xl opacity-80 animate-float">🌈</div>
+      {/* TOP NAVIGATION BAR */}
+      <nav className="w-full bg-white py-3 px-6 shadow-sm flex items-center justify-between sticky top-0 z-50">
+        {/* LOGO */}
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => soundFX.playPop()}>
+          <div className="text-3xl">📖</div>
+          <div className="flex flex-col">
+            <h1 className="text-xl md:text-2xl font-black text-rose-500 tracking-tight leading-none flex gap-0.5">
+              <span className="text-blue-900">S</span>
+              <span className="text-rose-500">T</span>
+              <span className="text-blue-900">O</span>
+              <span className="text-rose-500">R</span>
+              <span className="text-amber-500">Y</span>
+              <span className="text-emerald-500">V</span>
+              <span className="text-amber-500">E</span>
+              <span className="text-rose-500">R</span>
+              <span className="text-emerald-500">S</span>
+              <span className="text-purple-500">E</span>
+            </h1>
+            <span className="text-[10px] md:text-xs font-semibold text-slate-500 tracking-wide">
+              Stories Today, Brighter Tomorrows
+            </span>
+          </div>
+        </div>
 
-        {/* Floating Clouds */}
-        <div className="absolute top-8 left-8 text-5xl opacity-75 animate-float" style={{ animationDelay: '0s' }}>☁️</div>
-        <div className="absolute top-20 right-1/4 text-4xl opacity-65 animate-float" style={{ animationDelay: '1.5s' }}>☁️</div>
-        <div className="absolute top-36 left-1/3 text-3xl opacity-55 animate-float" style={{ animationDelay: '2.5s' }}>☁️</div>
+        {/* NAV LINKS (Desktop) */}
+        <div className="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-600">
+          <button className="flex items-center gap-1.5 text-blue-600 border-b-2 border-blue-600 pb-1 pt-1">
+            <div className="w-4 h-4 bg-blue-600 rounded-sm"></div> {/* Home icon placeholder */}
+            Home
+          </button>
+          <button className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <BookOpen className="w-4 h-4" />
+            Stories
+          </button>
+          <button className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <Gamepad2 className="w-4 h-4" />
+            Activities
+          </button>
+          <button className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <Heart className="w-4 h-4" />
+            For Parents
+          </button>
+        </div>
 
-        {/* Twinkling Stars & Playful Balloons */}
-        <div className="absolute top-14 left-1/4 text-2xl animate-bounce" style={{ animationDuration: '3s' }}>⭐</div>
-        <div className="absolute top-24 right-12 text-3xl animate-bounce" style={{ animationDuration: '2.5s' }}>✨</div>
-        <div className="absolute top-64 left-6 text-4xl animate-float" style={{ animationDelay: '3s' }}>🎈</div>
-        <div className="absolute top-96 right-8 text-4xl animate-float" style={{ animationDelay: '1s' }}>🚀</div>
-        <div className="absolute top-[32rem] left-12 text-3xl animate-bounce" style={{ animationDuration: '3.5s' }}>💧</div>
+        {/* SEARCH & PROFILE */}
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center bg-slate-100 rounded-full px-4 py-2 border border-slate-200">
+            <Search className="w-4 h-4 text-slate-400 mr-2" />
+            <input
+              type="text"
+              placeholder="Search stories..."
+              className="bg-transparent border-none outline-none text-sm font-medium w-48 text-slate-600 placeholder:text-slate-400"
+            />
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer bg-slate-50 rounded-full pl-1 pr-2 py-1 border border-slate-200 hover:bg-slate-100 transition-colors">
+            <div className="w-8 h-8 bg-rose-200 rounded-full overflow-hidden border-2 border-white shadow-sm flex items-center justify-center text-lg">
+              👦
+            </div>
+            <ChevronDown className="w-4 h-4 text-slate-500" />
+          </div>
+        </div>
+      </nav>
+
+      {/* HERO SECTION */}
+      <section className="relative w-full h-[500px] md:h-[550px] overflow-hidden">
+        {/* HERO BACKGROUND IMAGE */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/assets/hero_background_1790269568860.png"
+            alt="Welcome to Storyverse"
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        {/* HERO CONTENT */}
+        <div className="relative z-10 w-full h-full max-w-7xl mx-auto px-6 pt-16 flex flex-col items-start justify-start">
+          <div className="max-w-xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-blue-950 mb-1">Welcome to</h2>
+            <h1 className="text-6xl md:text-8xl font-black mb-4 flex gap-1 tracking-tight">
+              <span className="text-blue-900 drop-shadow-md">S</span>
+              <span className="text-blue-900 drop-shadow-md">T</span>
+              <span className="text-blue-900 drop-shadow-md">O</span>
+              <span className="text-rose-500 drop-shadow-md">R</span>
+              <span className="text-amber-400 drop-shadow-md">Y</span>
+              <span className="text-amber-500 drop-shadow-md">V</span>
+              <span className="text-emerald-500 drop-shadow-md">E</span>
+              <span className="text-rose-500 drop-shadow-md">R</span>
+              <span className="text-purple-600 drop-shadow-md">S</span>
+              <span className="text-purple-600 drop-shadow-md">E</span>
+            </h1>
+            <p className="text-lg md:text-xl font-medium text-slate-800 leading-snug max-w-md drop-shadow-sm bg-white/30 backdrop-blur-sm p-2 rounded-xl">
+              Interactive stories that spark imagination, <br />kindness and curiosity! ✨
+            </p>
+
+            {/* HERO ICONS ROW */}
+            <div className="flex items-center gap-6 mt-8 flex-wrap bg-white/70 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/50 inline-flex">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+                <div className="flex flex-col leading-none">
+                  <span className="text-sm font-bold text-slate-800">Read</span>
+                  <span className="text-[10px] font-semibold text-slate-500">Engaging stories</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Gamepad2 className="w-5 h-5 text-purple-600" />
+                <div className="flex flex-col leading-none">
+                  <span className="text-sm font-bold text-slate-800">Interact</span>
+                  <span className="text-[10px] font-semibold text-slate-500">Make choices</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <BrainCircuit className="w-5 h-5 text-amber-500" />
+                <div className="flex flex-col leading-none">
+                  <span className="text-sm font-bold text-slate-800">Learn</span>
+                  <span className="text-[10px] font-semibold text-slate-500">Life lessons</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Heart className="w-5 h-5 text-rose-500" />
+                <div className="flex flex-col leading-none">
+                  <span className="text-sm font-bold text-slate-800">Grow</span>
+                  <span className="text-[10px] font-semibold text-slate-500">In empathy & kindness</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* WAVY DIVIDER AT BOTTOM OF HERO */}
+        <div className="absolute bottom-0 w-full leading-none z-20 translate-y-1">
+          <svg className="w-full h-16 md:h-24" viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,60 C320,120 420,0 720,60 C1020,120 1120,0 1440,60 L1440,120 L0,120 Z" fill="#fbfdf9"></path>
+          </svg>
+        </div>
+      </section>
+
+      {/* FILTER BAR OVERLAPPING WAVY DIVIDER */}
+      <div className="relative z-30 flex justify-center -mt-8 mb-12 px-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 bg-white p-2 rounded-full shadow-lg border border-slate-100">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => {
+                soundFX.playPop();
+                setSelectedCategory(cat);
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm md:text-base font-bold transition-all cursor-pointer flex items-center gap-2 ${selectedCategory === cat
+                  ? 'bg-blue-500 text-white shadow-md scale-105'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
+                }`}
+            >
+              {cat === 'All Stories' && <BookOpen className="w-4 h-4" />}
+              {cat === 'Care & Empathy' && <Heart className="w-4 h-4 text-purple-500" />}
+              {cat === 'Adventure & Science' && <Compass className="w-4 h-4 text-amber-500" />}
+              {cat === 'Friendship & Honesty' && <Handshake className="w-4 h-4 text-emerald-500" />}
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* TOP HEADER & BRANDING */}
-      <header className="relative z-10 pt-6 pb-2 px-4 text-center select-none">
-        <div className="max-w-5xl mx-auto flex flex-col items-center gap-2.5">
-          
-          {/* TOP ANNOUNCEMENT BADGE */}
-          <div 
-            onClick={() => soundFX.playPop()}
-            className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md border-3 border-sky-300 shadow-md px-5 py-2 rounded-full cursor-pointer hover:scale-105 active:scale-95 transition-transform"
-          >
-            <Sparkles className="w-5 h-5 text-amber-500 animate-spin" />
-            <span className="text-xs md:text-sm font-black tracking-wide text-sky-800 uppercase">
-              ✨ Interactive Picture Storybooks ✨
-            </span>
-            <span className="bg-pink-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-xs">
-              Ages 3-9
-            </span>
+      {/* MAIN CONTENT AREA */}
+      <main className="max-w-7xl mx-auto px-6 pb-20 relative z-10">
+
+        {/* FEATURED STORIES SECTION */}
+        <section className="mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <h2 className="text-3xl font-black text-slate-800 flex items-center gap-2">
+                <span className="text-amber-400 text-4xl">⭐</span> Featured Stories
+              </h2>
+              <p className="text-slate-500 font-medium mt-1 text-sm md:text-base ml-1">
+                Jump into our most loved interactive adventures!
+              </p>
+            </div>
+            <button className="text-blue-600 font-bold hover:text-blue-700 flex items-center gap-1 text-sm">
+              View All Stories <MoveRight className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* MAIN APP TITLE */}
-          <h1 className="text-4xl md:text-6xl font-black tracking-wide text-sky-900 drop-shadow-sm flex items-center justify-center gap-2 flex-wrap">
-            <span className="animate-bounce" style={{ animationDuration: '2s' }}>📖</span>
-            <span className="bg-gradient-to-r from-sky-600 via-amber-500 to-pink-500 bg-clip-text text-transparent">
-              STORYVERSE
-            </span>
-            <span className="animate-bounce" style={{ animationDuration: '2.2s' }}>🎈</span>
-          </h1>
-
-          <p className="text-xs md:text-base text-slate-700 font-bold max-w-lg leading-relaxed">
-            Pick your favorite story card below to start reading, listening, and exploring warm adventures! 🌟
-          </p>
-
-          {/* CATEGORY FILTER TABS */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  soundFX.playPop();
-                  setSelectedCategory(cat);
-                }}
-                className={`px-4 py-2 rounded-full text-xs md:text-sm font-black transition-all cursor-pointer border-3 ${
-                  selectedCategory === cat
-                    ? 'bg-amber-400 text-amber-950 border-amber-500 shadow-md scale-105 ring-2 ring-amber-300'
-                    : 'bg-white/95 text-slate-700 hover:bg-white border-sky-200 shadow-xs'
-                }`}
+          {/* STORY CARDS GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredStories.map((story) => (
+              <div
+                key={story.id}
+                className="bg-white rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
-                {cat === 'All' ? '📚 All Stories' : cat}
-              </button>
-            ))}
-          </div>
-
-        </div>
-      </header>
-
-      {/* MAIN STORY GRID */}
-      <main className="max-w-6xl mx-auto px-4 pt-4 flex flex-col items-center gap-8 relative z-10">
-
-        {/* 3-COLUMN COMPACT STORY CARDS GRID */}
-        <section className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredStories.map((story) => (
-            <div
-              key={story.id}
-              className={`toy-card-3d p-4 flex flex-col justify-between relative group overflow-hidden ${
-                story.isAvailable
-                  ? 'border-sky-300 hover:border-amber-400'
-                  : 'border-slate-200 opacity-90'
-              }`}
-            >
-              {/* Card background ambient glow */}
-              <div className={`absolute -right-10 -top-10 w-36 h-36 rounded-full blur-2xl pointer-events-none opacity-40 bg-gradient-to-br ${story.color}`} />
-
-              <div>
-                {/* Badge Tag & Age */}
-                <div className="flex items-center justify-between gap-1 mb-2">
-                  <span className={`text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider border-2 shadow-2xs ${
-                    story.isAvailable
-                      ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                      : 'bg-amber-100 text-amber-900 border-amber-300'
-                  }`}>
-                    {story.badge}
-                  </span>
-                  <span className="text-[11px] font-black text-slate-700 bg-sky-100 px-2.5 py-0.5 rounded-full border border-sky-200">
-                    👦 {story.ageGroup}
-                  </span>
-                </div>
-
-                {/* COMPACT 3D STORY COVER ART (PROPORTIONAL 200px HEIGHT) */}
+                {/* STORY COVER IMAGE */}
                 <div
+                  className="w-full h-48 bg-slate-100 relative cursor-pointer group"
                   onClick={() => handleStartStory(story)}
-                  className={`w-full h-44 md:h-48 bg-gradient-to-br ${story.color} rounded-2xl border-4 border-white shadow-md p-3 flex flex-col items-center justify-center relative cursor-pointer group-hover:scale-[1.03] transition-transform select-none my-1`}
                 >
-                  <span className="text-5xl md:text-6xl drop-shadow-md animate-gentle-bounce">
-                    {story.coverEmoji}
-                  </span>
-                  <div className="mt-2 bg-white/20 backdrop-blur-xs px-3 py-1 rounded-full text-white text-xs font-black border border-white/40 flex items-center gap-1">
-                    <BookOpen className="w-3.5 h-3.5 text-white" />
-                    <span>{story.chaptersCount} Chapters</span>
+                  {story.coverImage ? (
+                    <img
+                      src={story.coverImage}
+                      alt={story.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className={`w-full h-full bg-gradient-to-br ${story.color} flex items-center justify-center text-6xl group-hover:scale-105 transition-transform duration-500`}>
+                      {story.coverEmoji}
+                    </div>
+                  )}
+
+                  {/* FLOATING AGE BADGE */}
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 border border-slate-200/50 shadow-sm flex items-center gap-1">
+                    {story.category === 'Care & Empathy' ? '🌸' : story.category === 'Adventure & Science' ? '⭐' : '🌿'}
+                    {story.ageGroup}
                   </div>
                 </div>
 
-                {/* Story Info Header */}
-                <div className="mt-2.5">
-                  <span className="text-[11px] font-extrabold text-sky-600 uppercase tracking-wider block">
-                    {story.category}
-                  </span>
-                  <h3 className="text-lg font-black text-slate-800 leading-snug">
+                {/* STORY INFO CONTENT */}
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="text-lg font-black text-slate-800 mb-2 leading-tight">
                     {story.title}
                   </h3>
-                  <p className="text-xs font-semibold text-slate-600 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-2 leading-relaxed flex-1">
                     {story.description}
                   </p>
-                </div>
 
-                {/* Moral Quote Card */}
-                <div className="mt-2.5 bg-amber-50 border-2 border-amber-200 p-2 rounded-xl flex items-start gap-1.5 shadow-2xs">
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-[11px] font-black text-amber-950 italic leading-tight">
-                    "{story.moral}"
-                  </p>
+                  {/* BOTTOM META & BUTTON */}
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center gap-3 text-xs font-bold text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" /> {story.readingTime}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="w-3.5 h-3.5" /> {story.chaptersCount} Chapters
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleStartStory(story)}
+                      className={`px-4 py-2 rounded-full text-white text-xs font-bold flex items-center gap-1 hover:brightness-110 transition-all ${story.id === 'dolly-midnight-adventure' ? 'bg-blue-500' :
+                          story.id === 'secret-cave' ? 'bg-emerald-500' :
+                            story.id === 'bottle-that-waited' ? 'bg-purple-500' :
+                              story.id === 'curious-rocket' ? 'bg-amber-500' :
+                                'bg-blue-500'
+                        }`}
+                    >
+                      Start Reading <MoveRight className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              {/* Action Area */}
-              <div className="mt-4 pt-2.5 border-t-2 border-slate-100 flex items-center justify-between gap-2">
-                <span className="text-[11px] font-black text-slate-500 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-sky-500" />
-                  {story.readingTime}
-                </span>
-
-                {story.isAvailable ? (
-                  <button
-                    onClick={() => handleStartStory(story)}
-                    className="toy-btn-sky px-4 py-2 rounded-2xl text-white font-black text-xs flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Read Story 📖</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => soundFX.playPop()}
-                    className="toy-btn-yellow px-3 py-1.5 rounded-2xl text-xs font-black flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Coming Soon ✨</span>
-                  </button>
-                )}
-              </div>
-
-            </div>
-          ))}
-
-          {/* "+ ADD NEW STORY" SLOT CARD */}
-          <div className="bg-white/80 border-4 border-dashed border-sky-300 rounded-3xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-2.5 hover:bg-white/95 hover:border-sky-400 transition-all cursor-pointer group min-h-[340px]">
-            <div className="w-14 h-14 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform border-2 border-sky-200 shadow-xs">
-              <PlusCircle className="w-8 h-8 text-sky-500" />
-            </div>
-            <h3 className="text-base font-black text-sky-900">
-              Add Your Next Story Here!
-            </h3>
-            <p className="text-xs text-slate-600 font-semibold max-w-xs leading-relaxed">
-              Ready to write new adventures? Easily add story objects inside <code className="bg-sky-100 px-1 py-0.5 rounded text-sky-800 font-bold">storyLibraryData.js</code>!
-            </p>
-            <div className="bg-sky-100 text-sky-800 text-[11px] font-black px-3.5 py-1 rounded-full border border-sky-300">
-              ✨ Multi-Story Shelf Ready
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* CUTE FEATURE HIGHLIGHTS FOR KIDS */}
-        <section className="w-full bg-white/95 backdrop-blur-md border-4 border-sky-300 p-5 md:p-6 rounded-3xl shadow-lg text-center flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2 bg-sky-100 text-sky-800 px-3.5 py-1 rounded-full font-bold text-xs uppercase border border-sky-300">
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>Storyverse Features for Kids</span>
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+        {/* EXPLORE BY THEME SECTION */}
+        <section className="mb-10">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                <span className="text-emerald-500 text-3xl">🌱</span> Explore by Theme
+              </h2>
+              <p className="text-slate-500 font-medium mt-1 text-sm ml-1">
+                Find the perfect story for every mood and moment.
+              </p>
+            </div>
+            <button className="text-blue-600 font-bold hover:text-blue-700 flex items-center gap-1 text-sm hidden sm:flex">
+              View All Categories <MoveRight className="w-4 h-4" />
+            </button>
           </div>
 
-          <h2 className="text-xl md:text-2xl font-black text-slate-800">
-            Everything Little Readers Love! 🎈
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 w-full">
-            <div 
-              onClick={() => soundFX.playPop()}
-              className="bg-amber-50 p-3.5 rounded-2xl border-2 border-amber-300 flex flex-col items-center text-center gap-1.5 hover:scale-105 transition-transform cursor-pointer shadow-xs"
-            >
-              <span className="text-3xl">🎨</span>
-              <h4 className="font-black text-amber-950 text-xs">Tap & Explore</h4>
-              <p className="text-[11px] font-medium text-slate-600">Touch objects in picture pages to trigger sounds & animations!</p>
+          <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
+            {/* Thematic pill cards placeholder to match design */}
+            <div className="shrink-0 bg-blue-50 border border-blue-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">🛏️</div>
+              <span className="font-bold text-blue-900 text-sm">Bedtime</span>
             </div>
-
-            <div 
-              onClick={() => soundFX.playPop()}
-              className="bg-sky-50 p-3.5 rounded-2xl border-2 border-sky-300 flex flex-col items-center text-center gap-1.5 hover:scale-105 transition-transform cursor-pointer shadow-xs"
-            >
-              <span className="text-3xl">🎙️</span>
-              <h4 className="font-black text-sky-950 text-xs">Read-Aloud Voice</h4>
-              <p className="text-[11px] font-medium text-slate-600">Clear narrator voice reading every story sentence word by word!</p>
+            <div className="shrink-0 bg-rose-50 border border-rose-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">❤️</div>
+              <span className="font-bold text-rose-900 text-sm">Empathy</span>
             </div>
-
-            <div 
-              onClick={() => soundFX.playPop()}
-              className="bg-emerald-50 p-3.5 rounded-2xl border-2 border-emerald-300 flex flex-col items-center text-center gap-1.5 hover:scale-105 transition-transform cursor-pointer shadow-xs"
-            >
-              <span className="text-3xl">🔊</span>
-              <h4 className="font-black text-emerald-950 text-xs">Real Sound FX</h4>
-              <p className="text-[11px] font-medium text-slate-600">School bells, water glugs, footsteps, and rocket whooshes!</p>
+            <div className="shrink-0 bg-emerald-50 border border-emerald-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">🌳</div>
+              <span className="font-bold text-emerald-900 text-sm">Nature</span>
             </div>
-
-            <div 
-              onClick={() => soundFX.playPop()}
-              className="bg-pink-50 p-3.5 rounded-2xl border-2 border-pink-300 flex flex-col items-center text-center gap-1.5 hover:scale-105 transition-transform cursor-pointer shadow-xs"
-            >
-              <span className="text-3xl">🏆</span>
-              <h4 className="font-black text-pink-950 text-xs">Care Certificate</h4>
-              <p className="text-[11px] font-medium text-slate-600">Finish any story adventure to unlock your printable certificate!</p>
+            <div className="shrink-0 bg-purple-50 border border-purple-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">🦸‍♀️</div>
+              <span className="font-bold text-purple-900 text-sm">Courage</span>
+            </div>
+            <div className="shrink-0 bg-amber-50 border border-amber-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">😂</div>
+              <span className="font-bold text-amber-900 text-sm">Funny</span>
+            </div>
+            <div className="shrink-0 bg-sky-50 border border-sky-100 rounded-[2rem] p-4 w-40 flex flex-col items-center justify-center gap-3 cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-sm">🚀</div>
+              <span className="font-bold text-sky-900 text-sm">Space</span>
             </div>
           </div>
         </section>
 
       </main>
-
     </div>
   );
 }
+
 
 
 
