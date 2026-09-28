@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { BookOpen, Volume2 } from 'lucide-react';
 import Navbar from './components/Navbar';
 import StorybookFrame from './components/StorybookFrame';
 import SceneControls from './components/SceneControls';
@@ -49,7 +50,7 @@ export default function App() {
   const [activeLanguage, setActiveLanguage] = useState('en');
   const [unlockedBadges, setUnlockedBadges] = useState(['story-explorer']);
   const [learnedWords, setLearnedWords] = useState([]);
-  
+
   // Modals
   const [activeWordMagic, setActiveWordMagic] = useState(null);
   const [showEaselModal, setShowEaselModal] = useState(false);
@@ -66,7 +67,7 @@ export default function App() {
 
   const currentScene = currentStoryScenes.find(s => s.id === currentSceneId) || currentStoryScenes[0];
   const currentSentences = currentScene.sentences || [];
-  
+
   // Safely clamp sentence index within bounds
   const safeSentenceIndex = Math.min(currentSentenceIndex, Math.max(0, currentSentences.length - 1));
   const currentSentence = currentSentences[safeSentenceIndex] || currentSentences[0];
@@ -233,7 +234,7 @@ export default function App() {
   const handleQuizSelect = (quizOption) => {
     soundFX.playPop();
     setSelectedQuizAnswers(prev => ({ ...prev, [currentSceneId]: quizOption.id }));
-    
+
     // Kindness badge tracking for caring options
     if (quizOption.text?.toLowerCase().includes('stay') || quizOption.text?.toLowerCase().includes('help')) {
       unlockBadge('kindness-hero');
@@ -399,12 +400,11 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen w-full flex flex-col justify-between relative text-slate-800 font-['Fredoka',sans-serif] selection:bg-amber-300 overflow-x-hidden pb-6 transition-colors duration-1000 ${
-      isBedtimeMode
+    <div className={`min-h-screen w-full flex flex-col justify-between relative text-slate-800 font-['Fredoka',sans-serif] selection:bg-amber-300 overflow-x-hidden pb-6 transition-colors duration-1000 ${isBedtimeMode
         ? 'bg-gradient-to-b from-indigo-950 via-slate-900 via-60% to-purple-950 text-slate-100'
         : 'bg-gradient-to-b from-sky-200 via-amber-50 via-60% to-sky-100'
-    }`}>
-      
+      }`}>
+
       {/* Bedtime Atmosphere Overlay */}
       <BedtimeCalmOverlay isActive={isBedtimeMode} />
 
@@ -430,15 +430,14 @@ export default function App() {
       />
 
       <main className="w-full max-w-7xl mx-auto flex-1 p-3 md:p-6 flex flex-col gap-6 items-stretch z-10">
-        
+
         {/* FULLSCREEN 3D OPEN STORYBOOK WRAPPER */}
-        <div className={`backdrop-blur-md p-3 md:p-5 w-full rounded-[2.5rem] border-4 shadow-2xl relative flex flex-col ${
-          isBedtimeMode ? 'bg-slate-900/90 border-indigo-500' : 'bg-white/80 border-sky-300'
-        }`}>
+        <div className={`backdrop-blur-md p-3 md:p-5 w-full rounded-[2.5rem] border-4 shadow-2xl relative flex flex-col ${isBedtimeMode ? 'bg-slate-900/90 border-indigo-500' : 'bg-white/80 border-sky-300'
+          }`}>
 
           {/* ALWAYS SIDE-BY-SIDE 2-PAGE OPEN STORYBOOK SPREAD */}
           <div className="grid grid-cols-12 gap-0 items-stretch w-full flex-1 min-h-0 relative rounded-xl overflow-hidden shadow-2xl">
-            
+
             {/* LEFT PAGE: PICTURE STORYBOOK ILLUSTRATION */}
             <div className="col-span-6 h-full min-h-0 flex flex-col justify-center relative overflow-hidden">
               <StorybookFrame
@@ -458,68 +457,62 @@ export default function App() {
 
             {/* RIGHT PAGE: AUTHENTIC PRINTED STORY READING PAGE */}
             <div className="col-span-6 parchment-page rounded-r-3xl rounded-l-none border-y-4 border-r-8 border-l-2 border-amber-700 p-3 md:p-4 shadow-2xl flex flex-col justify-between gap-3 relative select-none book-paper-stack-right overflow-y-auto">
-              
+
               {/* COMPACT CHAPTER & SPEAKER HEADER */}
-              <div className="flex items-center justify-between border-b border-amber-300/60 pb-1.5 mb-1 font-['Fredoka',sans-serif]">
+              <div className="flex items-center justify-between pb-1 font-['Fredoka',sans-serif]">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-950 bg-gradient-to-r from-amber-200 to-amber-300 px-2.5 py-0.5 rounded-full border border-amber-400/80 shadow-xs shrink-0">
-                    {currentSentence?.speaker === 'LILY' ? '🎀 Lily Doll' : currentSentence?.speaker === 'GIRL' ? '👧 Little Girl' : currentSentence?.speaker === 'RABBIT' ? '🐰 Teacup Rabbit' : currentSentence?.speaker === 'MILO' ? '🦊 Milo' : currentSentence?.speaker === 'TOBY' ? '🐰 Toby' : currentSentence?.speaker === 'ROCKY' ? '🚀 Rocky' : currentSentence?.speaker === 'COMET' ? '☄️ Starry' : currentSentence?.speaker === 'BENNY' ? '🐻 Benny Bear' : currentSentence?.speaker === 'BOTTLE' ? '💧 Buddy Bottle' : currentSentence?.speaker === 'AARAV' ? '👦 Aarav' : '📖 Narrator'}
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-950 bg-amber-200 px-2.5 py-1 rounded-full shadow-sm shrink-0 flex items-center gap-1">
+                    📖 {currentSentence?.speaker === 'LILY' ? '🎀 Lily Doll' : currentSentence?.speaker === 'GIRL' ? '👧 Little Girl' : currentSentence?.speaker === 'RABBIT' ? '🐰 Teacup Rabbit' : currentSentence?.speaker === 'MILO' ? '🦊 Milo' : currentSentence?.speaker === 'TOBY' ? '🐰 Toby' : currentSentence?.speaker === 'ROCKY' ? '🚀 Rocky' : currentSentence?.speaker === 'COMET' ? '☄️ Starry' : currentSentence?.speaker === 'BENNY' ? '🐻 Benny Bear' : currentSentence?.speaker === 'BOTTLE' ? '💧 Buddy' : currentSentence?.speaker === 'AARAV' ? '👦 Aarav' : 'NARRATOR'}
                   </span>
-                  <h2 className="text-xs md:text-sm font-black text-amber-950 tracking-tight truncate">
+                  <h2 className="text-sm font-bold text-slate-800 tracking-tight truncate">
                     {currentScene.title}
                   </h2>
                 </div>
-                <div className="flex items-center gap-1">
-                  {activeLanguage !== 'en' && (
-                    <span className="text-[10px] font-black uppercase bg-indigo-200 text-indigo-950 px-2 py-0.5 rounded-full border border-indigo-300">
-                      {activeLanguage.toUpperCase()}
-                    </span>
-                  )}
-                  <span className="text-[11px] font-black text-amber-900 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300 shadow-2xs shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-amber-950 shrink-0">
                     Line {safeSentenceIndex + 1}/{currentSentences.length}
                   </span>
+                  <button className="bg-sky-100 p-1.5 rounded-full text-sky-600 hover:bg-sky-200 shadow-sm border border-sky-200" onClick={() => {
+                    if (currentSentence && narratorEnabled) narrator.speakSentence(currentSentence);
+                  }}>
+                    <Volume2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
               {/* FULL PRINTED STORYBOOK CHAPTER TEXT BLOCK */}
-              <div className="bg-[#fffefb]/95 border-2 border-amber-300/80 p-3 md:p-4 rounded-2xl shadow-inner flex flex-col gap-2 relative border-double font-['Fredoka',sans-serif]">
-                <div className="text-xs md:text-sm text-slate-800 leading-relaxed space-y-1.5 font-medium">
-                  {currentSentences.map((sent, idx) => {
-                    const isCurrent = idx === safeSentenceIndex;
-                    return (
-                      <div
-                        key={sent.id || idx}
-                        onClick={() => setCurrentSentenceIndex(idx)}
-                        className={`cursor-pointer transition-all p-2 rounded-xl flex items-start gap-2 ${
-                          isCurrent
-                            ? 'bg-amber-200/90 text-amber-950 font-bold border-l-4 border-amber-600 shadow-sm scale-[1.01]'
-                            : 'hover:bg-amber-100/70 text-slate-700 font-medium'
+              <div className="flex flex-col gap-2 font-['Fredoka',sans-serif] px-1">
+                {currentSentences.map((sent, idx) => {
+                  const isCurrent = idx === safeSentenceIndex;
+                  return (
+                    <p
+                      key={sent.id || idx}
+                      onClick={() => setCurrentSentenceIndex(idx)}
+                      className={`cursor-pointer transition-all leading-snug ${isCurrent
+                          ? 'text-lg font-bold text-slate-900'
+                          : 'text-sm font-semibold text-slate-500 hover:text-slate-700'
                         }`}
-                      >
-                        {sent.speaker && sent.speaker !== 'NARRATOR' && (
-                          <span className="text-[10px] font-black tracking-wider uppercase text-amber-950 shrink-0 bg-amber-300 px-2 py-0.5 rounded-md border border-amber-400/80 shadow-2xs mt-0.5">
-                            {sent.speaker === 'LILY' ? '🎀 Lily' : sent.speaker === 'GIRL' ? '👧 Girl' : sent.speaker === 'RABBIT' ? '🐰 Rabbit' : sent.speaker === 'MILO' ? '🦊 Milo' : sent.speaker === 'TOBY' ? '🐰 Toby' : sent.speaker === 'BOTTLE' ? '💧 Buddy' : sent.speaker}:
-                          </span>
-                        )}
-                        <p className="leading-snug">
-                          "{renderInteractiveText(sent.text)}"
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* FULL CHAPTER NARRATION SUMMARY */}
-                {currentScene.narration && (
-                  <div className="pt-2 border-t border-amber-300/50 text-[11px] md:text-xs text-amber-900 font-medium leading-relaxed bg-amber-50/60 p-2.5 rounded-xl border border-amber-200/80">
-                    <span className="font-black text-amber-950 block mb-0.5">📖 Chapter Summary:</span>
-                    {currentScene.narration}
-                  </div>
-                )}
+                    >
+                      "{renderInteractiveText(sent.text)}"
+                    </p>
+                  );
+                })}
               </div>
 
-              {/* READ-ALOUD VOICE RECORDER WIDGET */}
-              <VoiceRecorderWidget currentSentenceText={currentSentence?.text} />
+              {/* FULL CHAPTER NARRATION SUMMARY */}
+              {currentScene.narration && (
+                <div className="bg-pink-100 border border-pink-200 p-3 rounded-2xl flex flex-col gap-1.5 shadow-sm mt-1 mb-1">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-pink-500 text-white p-1 rounded-lg">
+                      <BookOpen className="w-3 h-3" />
+                    </div>
+                    <span className="text-xs font-bold text-rose-600">Chapter Summary</span>
+                  </div>
+                  <p className="text-[11.5px] font-semibold text-slate-700 leading-relaxed">
+                    {renderInteractiveText(currentScene.narration)}
+                  </p>
+                </div>
+              )}
 
               {/* SELECTIVE INTERACTIVE REFLECTION PANEL FOR CURRENT SCENE */}
               <InteractivePanel
@@ -534,7 +527,7 @@ export default function App() {
               />
 
               {/* INTEGRATED PAGE TURN NAVIGATION CONTROLS */}
-              <div className="pt-2 mt-1 border-t-2 border-amber-300/60 font-['Fredoka',sans-serif]">
+              <div className="pt-1 mt-auto font-['Fredoka',sans-serif]">
                 <SceneControls
                   currentSceneId={currentSceneId}
                   totalScenes={currentStoryScenes.length}

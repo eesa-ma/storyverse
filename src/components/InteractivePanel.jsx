@@ -6,10 +6,10 @@ export default function InteractivePanel({
   selectedQuizAnswer = null,
   waterStep = 0,
   checklistState = {},
-  onQuizSelect = () => {},
-  onPlayFootstepAudio = () => {},
-  onObjectTap = () => {},
-  onChecklistToggle = () => {}
+  onQuizSelect = () => { },
+  onPlayFootstepAudio = () => { },
+  onObjectTap = () => { },
+  onChecklistToggle = () => { }
 }) {
   const [inspectedObject, setInspectedObject] = React.useState(null);
 
@@ -25,31 +25,61 @@ export default function InteractivePanel({
 
       {/* SCENE 1: Explore Classroom Desk Grid */}
       {scene.id === 1 && (
-        <div className="bg-gradient-to-r from-amber-100/90 to-yellow-100/80 border-2 border-amber-300 p-2.5 rounded-2xl flex flex-col gap-2 shadow-md">
-          <p className="text-xs font-bold text-amber-950 flex items-center gap-1.5 font-cinzel">
-            <Search className="w-4 h-4 text-amber-700 animate-bounce" />
-            <span>Desk Explorer: Tap an item to inspect your buddy's gear!</span>
-          </p>
-
-          <div className="grid grid-cols-4 gap-1.5">
-            {(scene.objects || []).map((obj) => (
-              <button
-                key={obj.id}
-                onClick={() => handleDeskItemClick(obj.id)}
-                className={`p-1.5 border-2 rounded-xl flex flex-col items-center gap-0.5 shadow-sm transition-all active:scale-95 group ${
-                  inspectedObject === obj.id
-                    ? 'bg-amber-200 border-amber-500 scale-105 ring-2 ring-amber-400/50'
-                    : 'bg-[#fffdf8] hover:bg-amber-200/80 border-amber-300/80'
-                }`}
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">{obj.icon}</span>
-                <span className="text-[10px] font-bold text-amber-900 font-cinzel">{obj.name}</span>
+        <div className="flex flex-col gap-3">
+          
+          <div className="grid grid-cols-2 gap-2">
+            {/* Left Header: Desk Explorer */}
+            <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-2xl flex items-center gap-2 shadow-sm">
+              <div className="bg-emerald-800 text-emerald-50 p-1.5 rounded-full">
+                <Search className="w-5 h-5" />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-[13px] font-bold text-emerald-900 leading-tight">DESK EXPLORER ✨</p>
+                <p className="text-[10px] font-semibold text-emerald-700">Tap an item to inspect your Buddy's gear!</p>
+              </div>
+            </div>
+            
+            {/* Right Header: Voice Recorder */}
+            <div className="bg-pink-50 border border-pink-200 p-2.5 rounded-2xl flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="bg-pink-500 text-pink-50 p-1.5 rounded-full">
+                  <Volume2 className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-[13px] font-bold text-rose-900 leading-tight">Read Aloud Voice Recorder</p>
+                  <p className="text-[10px] font-semibold text-rose-700">Tap 🔴 to record your reading voice!</p>
+                </div>
+              </div>
+              <button className="bg-rose-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 shadow-sm active:scale-95">
+                <span className="w-1.5 h-1.5 bg-white rounded-full"></span> Record
               </button>
-            ))}
+            </div>
+          </div>
+
+          {/* Items Grid */}
+          <div className="grid grid-cols-4 gap-2">
+            {(scene.objects || []).map((obj, idx) => {
+              const bgColors = ['bg-sky-100 border-sky-200', 'bg-pink-100 border-pink-200', 'bg-amber-100 border-amber-200', 'bg-indigo-100 border-indigo-200'];
+              const hoverColors = ['hover:bg-sky-200', 'hover:bg-pink-200', 'hover:bg-amber-200', 'hover:bg-indigo-200'];
+              const textColors = ['text-sky-900', 'text-pink-900', 'text-amber-900', 'text-indigo-900'];
+              
+              return (
+                <button
+                  key={obj.id}
+                  onClick={() => handleDeskItemClick(obj.id)}
+                  className={`p-3 border-2 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 group ${bgColors[idx % 4]} ${hoverColors[idx % 4]} ${
+                    inspectedObject === obj.id ? 'ring-2 ring-slate-400 scale-105' : ''
+                  }`}
+                >
+                  <span className="text-3xl group-hover:scale-110 transition-transform mb-1">{obj.icon}</span>
+                  <span className={`text-[10px] font-black uppercase tracking-wide ${textColors[idx % 4]}`}>{obj.name}</span>
+                </button>
+              );
+            })}
           </div>
 
           {inspectedObject && (
-            <div className="bg-amber-200/90 border border-amber-400 p-1.5 rounded-xl text-center text-[11px] font-bold text-amber-950 flex items-center justify-center gap-1.5 font-reading">
+            <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-center text-xs font-bold text-slate-700 shadow-inner">
               <span>
                 {inspectedObject === 'bottle' && '💧 Buddy Bottle: A special blue water bottle with a rocket sticker!'}
                 {inspectedObject === 'bag' && '🎒 Schoolbag: Aarav\'s sturdy red backpack.'}
@@ -80,13 +110,12 @@ export default function InteractivePanel({
                 <button
                   key={ans.id}
                   onClick={() => onQuizSelect(ans)}
-                  className={`p-2.5 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${
-                    isSelected
+                  className={`p-2.5 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${isSelected
                       ? ans.isCorrect
                         ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-md scale-105'
                         : 'bg-rose-100 border-rose-400 text-rose-950'
                       : 'bg-[#fffdf8] border-amber-300 hover:bg-amber-200/60 text-amber-950 shadow-sm'
-                  }`}
+                    }`}
                 >
                   <span className="text-sm font-serif">{ans.label}</span>
                 </button>
@@ -148,13 +177,12 @@ export default function InteractivePanel({
                 <button
                   key={ans.id}
                   onClick={() => onQuizSelect(ans)}
-                  className={`p-2 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${
-                    isSelected
+                  className={`p-2 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${isSelected
                       ? ans.isCorrect
                         ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-md scale-105'
                         : 'bg-rose-100 border-rose-400 text-rose-950'
                       : 'bg-[#fffdf8] border-amber-300 hover:bg-amber-200/60 text-amber-950 shadow-sm'
-                  }`}
+                    }`}
                 >
                   <span className="text-sm font-serif">{ans.label}</span>
                 </button>
@@ -235,13 +263,12 @@ export default function InteractivePanel({
                 <button
                   key={ans.id}
                   onClick={() => onQuizSelect(ans)}
-                  className={`p-2 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${
-                    isSelected
+                  className={`p-2 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex flex-col items-center gap-1 ${isSelected
                       ? ans.isCorrect
                         ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-md scale-105'
                         : 'bg-rose-100 border-rose-400 text-rose-950'
                       : 'bg-[#fffdf8] border-amber-300 hover:bg-amber-200/60 text-amber-950 shadow-sm'
-                  }`}
+                    }`}
                 >
                   <span className="text-sm font-serif">{ans.label}</span>
                 </button>
@@ -277,11 +304,10 @@ export default function InteractivePanel({
               return (
                 <div
                   key={st.step}
-                  className={`p-2 rounded-xl border-2 text-center text-xs font-bold transition-all ${
-                    isDone
+                  className={`p-2 rounded-xl border-2 text-center text-xs font-bold transition-all ${isDone
                       ? 'bg-sky-200 border-sky-500 text-sky-950 shadow-sm scale-105'
                       : 'bg-white border-slate-200 text-slate-500 opacity-60'
-                  }`}
+                    }`}
                 >
                   <span className="font-serif">{st.label}</span>
                 </div>
@@ -311,11 +337,10 @@ export default function InteractivePanel({
                 <button
                   key={chk.id}
                   onClick={() => onChecklistToggle(chk.id)}
-                  className={`p-2 rounded-xl border-2 text-xs font-bold flex items-center gap-2 transition-all ${
-                    isChecked
+                  className={`p-2 rounded-xl border-2 text-xs font-bold flex items-center gap-2 transition-all ${isChecked
                       ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-sm'
                       : 'bg-[#fffdf8] border-emerald-300 text-emerald-900 hover:bg-emerald-100'
-                  }`}
+                    }`}
                 >
                   <span className="text-sm">{isChecked ? '✅' : '⬜'}</span>
                   <span className="font-serif">{chk.label}</span>
@@ -346,11 +371,10 @@ export default function InteractivePanel({
                 <button
                   key={ans.id}
                   onClick={() => onQuizSelect(ans)}
-                  className={`p-2.5 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                    isSelected
+                  className={`p-2.5 rounded-xl border-2 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${isSelected
                       ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-md scale-105'
                       : 'bg-[#fffdf8] border-amber-300 hover:bg-amber-200/60 text-amber-950 shadow-sm'
-                  }`}
+                    }`}
                 >
                   <span className="text-xs font-serif">{ans.label}</span>
                 </button>
@@ -382,13 +406,12 @@ export default function InteractivePanel({
                 <button
                   key={opt.id}
                   onClick={() => onQuizSelect(opt)}
-                  className={`p-3 rounded-xl border-2 font-bold text-xs md:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm ${
-                    isSelected
+                  className={`p-3 rounded-xl border-2 font-bold text-xs md:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm ${isSelected
                       ? opt.isCorrect
                         ? 'bg-emerald-200 border-emerald-600 text-emerald-950 shadow-md scale-105 ring-2 ring-emerald-400'
                         : 'bg-rose-100 border-rose-400 text-rose-950'
                       : 'bg-[#fffdf8] hover:bg-amber-200/80 border-amber-300 text-amber-950'
-                  }`}
+                    }`}
                 >
                   <span>{opt.text}</span>
                 </button>
@@ -417,11 +440,10 @@ export default function InteractivePanel({
               <button
                 key={obj.id}
                 onClick={() => handleDeskItemClick(obj.id)}
-                className={`p-2 border-2 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 group ${
-                  inspectedObject === obj.id
+                className={`p-2 border-2 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 group ${inspectedObject === obj.id
                     ? 'bg-amber-200 border-amber-500 scale-105 ring-2 ring-amber-400/50'
                     : 'bg-[#fffdf8] hover:bg-amber-200/80 border-amber-300/80'
-                }`}
+                  }`}
               >
                 <span className="text-xl group-hover:scale-110 transition-transform">{obj.icon}</span>
                 <span className="text-xs font-bold text-amber-950 font-['Fredoka',sans-serif]">{obj.name}</span>

@@ -219,11 +219,10 @@ export default function StorybookFrame({
                   </div>
                 ) : (
                   /* Bedroom Night / Sunrise View */
-                  <div className={`absolute inset-0 transition-all duration-700 ${
-                    scene.background === 'bedroom-sunrise'
+                  <div className={`absolute inset-0 transition-all duration-700 ${scene.background === 'bedroom-sunrise'
                       ? 'bg-gradient-to-b from-amber-200 via-rose-100 to-amber-100'
                       : 'bg-gradient-to-b from-indigo-950 via-slate-900 to-indigo-900'
-                  } flex flex-col justify-between p-4`}>
+                    } flex flex-col justify-between p-4`}>
                     {/* Moon or Sun */}
                     <div className="absolute top-4 right-6 pointer-events-none">
                       {scene.background === 'bedroom-sunrise' ? (
@@ -541,7 +540,7 @@ export default function StorybookFrame({
                     {speaker === 'BOTTLE' ? 'Buddy' : speaker === 'AARAV' ? 'Aarav' : 'Narrator'}
                   </span>
                 </div>
-                
+
                 <p className="text-xs md:text-sm font-bold text-amber-100 leading-snug truncate flex-1 text-left drop-shadow-sm">
                   "{currentSentence.text}"
                 </p>
