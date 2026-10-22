@@ -1,25 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Home, Play, Pause,
-  Volume2, VolumeX, Mic, MicOff, Maximize2, Minimize2,
-  BookOpen, Wand2, Droplets, Sparkles, Drama
+  Volume2, VolumeX, Mic, MicOff, Maximize2, Minimize2
 } from 'lucide-react';
 import { soundFX } from '../services/soundEffects';
-
-/* ────────────────────────────────────────────────
-   Small coloured circle badge that holds an icon
-   ──────────────────────────────────────────────── */
-function IconBadge({ bg, children }) {
-  return (
-    <span
-      className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-      style={{ background: bg }}
-    >
-      {children}
-    </span>
-  );
-}
-
 
 export default function Navbar({
   currentSceneId,
@@ -53,52 +37,44 @@ export default function Navbar({
 
 
 
-  // Story icon by title keyword
-  const StoryIcon =
-    activeStoryTitle.toLowerCase().includes('dolly') ? Drama
-    : activeStoryTitle.toLowerCase().includes('cave') ? Wand2
-    : activeStoryTitle.toLowerCase().includes('rocket') ? Sparkles
-    : Droplets;
-
   return (
     <header
-      className="sticky top-0 z-40 w-full overflow-hidden"
+      className="sticky top-0 z-40 w-[calc(100%-2rem)] max-w-[1325px] mx-auto mt-[18px] rounded-[21px] overflow-hidden"
       style={{
-        background: '#ffffff',
-        borderBottom: '1.5px solid #e2e8f0',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-        height: '56px',
+        background: 'rgba(255,255,255,0.92)',
+        border: '1px solid rgba(255,255,255,0.98)',
+        boxShadow: '0 7px 22px rgba(30,64,175,0.14)',
+        backdropFilter: 'blur(12px)',
+        height: '62px',
+        marginTop: '18px',
         fontFamily: "'Fredoka', sans-serif",
       }}
     >
-      <div className="h-full flex items-center gap-2 px-3 md:px-4">
+      <div className="h-full flex items-center gap-3 px-3 md:px-4">
 
         {/* ── LEFT: Library + Story Title ────────────────── */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
 
           {/* Library */}
           <button
             onClick={() => { soundFX.playPop(); onGoHome(); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 transition-all cursor-pointer shrink-0"
+            className="flex items-center gap-2 px-1.5 py-1.5 rounded-full bg-transparent hover:bg-sky-50 active:scale-95 transition-all cursor-pointer shrink-0"
           >
-            <IconBadge bg="#64748b">
-              <Home className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-            </IconBadge>
-            <span className="text-[13px] font-black text-slate-800 whitespace-nowrap">Library</span>
+            <span className="w-11 h-11 rounded-full bg-[#edf6ff] flex items-center justify-center">
+              <Home className="w-5 h-5 text-[#1976d2] fill-[#1976d2]" strokeWidth={2.6} />
+            </span>
+            <span className="text-[14px] font-black text-[#102b57] whitespace-nowrap">Library</span>
           </button>
 
           {/* Story title pill — visible at lg+ */}
           <div
-            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-100 bg-white shrink-0"
+            className="hidden md:flex items-center gap-2.5 shrink-0"
           >
-            <IconBadge bg="#38bdf8">
-              <StoryIcon className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-            </IconBadge>
             <div className="flex flex-col leading-none">
-              <span className="text-[13px] font-black text-slate-800 whitespace-nowrap max-w-[160px] truncate">
+              <span className="text-[18px] md:text-[20px] font-black text-[#102b57] whitespace-nowrap max-w-[300px] truncate">
                 {activeStoryTitle}
               </span>
-              <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+              <span className="text-[8px] font-bold text-[#7890ad] uppercase tracking-[0.2em] mt-1 whitespace-nowrap">
                 Interactive Storybook Reader
               </span>
             </div>
@@ -109,46 +85,46 @@ export default function Navbar({
         <div className="flex-1" />
 
         {/* ── RIGHT: Settings ─────────────────────────────── */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
 
 
           {/* Sound */}
           <button
             onClick={() => { soundFX.playPop(); onToggleSound(); }}
             title={soundMuted ? 'Unmute' : 'Mute'}
-            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
+            className="w-11 h-11 rounded-full border border-[#e2ebf4] bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-sky-50"
           >
             {soundMuted
-              ? <VolumeX className="w-4 h-4 text-slate-400" strokeWidth={2.5} />
-              : <Volume2 className="w-4 h-4 text-emerald-500" strokeWidth={2.5} />}
+              ? <VolumeX className="w-5 h-5 text-slate-400" strokeWidth={2.5} />
+              : <Volume2 className="w-5 h-5 text-emerald-500" strokeWidth={2.5} />}
           </button>
 
           {/* Narrator */}
           <button
             onClick={() => { soundFX.playPop(); onToggleNarrator(); }}
             title={narratorEnabled ? 'Narrator On' : 'Narrator Off'}
-            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
+            className="w-11 h-11 rounded-full border border-[#e2ebf4] bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-amber-50"
           >
             {narratorEnabled
-              ? <Mic className="w-4 h-4 text-amber-500" strokeWidth={2.5} />
-              : <MicOff className="w-4 h-4 text-slate-400" strokeWidth={2.5} />}
+              ? <Mic className="w-5 h-5 text-amber-500" strokeWidth={2.5} />
+              : <MicOff className="w-5 h-5 text-slate-400" strokeWidth={2.5} />}
           </button>
 
           {/* Fullscreen */}
           <button
             onClick={toggleFullScreen}
             title="Fullscreen"
-            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
+            className="w-11 h-11 rounded-full border border-[#e2ebf4] bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
           >
             {isFullscreen
-              ? <Minimize2 className="w-4 h-4 text-slate-500" strokeWidth={2.5} />
-              : <Maximize2 className="w-4 h-4 text-slate-500" strokeWidth={2.5} />}
+              ? <Minimize2 className="w-5 h-5 text-slate-500" strokeWidth={2.5} />
+              : <Maximize2 className="w-5 h-5 text-slate-500" strokeWidth={2.5} />}
           </button>
 
           {/* ── Auto-Play: large blue pill ── */}
           <button
             onClick={() => { soundFX.playPop(); onToggleAutoPlay(); }}
-            className={`flex items-center gap-2 pl-3 pr-4 py-2 rounded-full font-black text-[13px] text-white cursor-pointer active:scale-95 transition-all shrink-0 ${
+            className={`flex items-center gap-2.5 pl-5 pr-6 py-2.5 rounded-full font-black text-[13px] text-white cursor-pointer active:scale-95 transition-all shrink-0 ${
               isAutoPlayActive ? 'animate-pulse' : ''
             }`}
             style={{

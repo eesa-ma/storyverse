@@ -565,26 +565,52 @@ export default function App() {
               style={{ background: 'linear-gradient(180deg, #fffef7 0%, #fdf9ee 60%, #faf5e4 100%)' }}
             >
               {/* CHAPTER HEADER — thin elegant stripe */}
-              <div className="flex items-center justify-between px-5 pt-3.5 pb-3 border-b shrink-0" style={{ borderColor: '#f0e4c0' }}>
+              <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b shrink-0" style={{ borderColor: '#ead7b4' }}>
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full shrink-0"
-                    style={{ background: '#fde68a', color: '#78350f', border: '1px solid #f59e0b' }}
+                    className="text-[11px] font-black uppercase tracking-wide px-3 py-1 rounded-full shrink-0"
+                    style={{ background: '#ffe38a', color: '#142b55', border: '1px solid #f3c94c' }}
                   >
                     Ch. {currentSceneId}
                   </span>
-                  <span className="text-sm font-black text-slate-800 truncate max-w-[200px]">
+                  <span className="text-base font-black text-[#102b57] truncate max-w-[280px]">
                     {currentScene.title}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] font-semibold text-slate-400">
+                  <button
+                    onClick={() => {
+                      soundFX.playPageFlip();
+                      if (safeSentenceIndex > 0) handlePrevSentence();
+                      else if (currentSceneId > 1) handlePrevScene();
+                    }}
+                    disabled={currentSceneId === 1 && safeSentenceIndex === 0}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center text-slate-500 hover:bg-white disabled:opacity-35 disabled:cursor-not-allowed transition-all"
+                    style={{ borderColor: '#e6dcc8', background: '#fffdf8' }}
+                    aria-label="Previous page"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-[11px] font-bold text-[#7b8ca6] min-w-[35px] text-center">
                     {safeSentenceIndex + 1} / {currentSentences.length}
                   </span>
                   <button
+                    onClick={() => {
+                      soundFX.playPageFlip();
+                      if (safeSentenceIndex < currentSentences.length - 1) handleNextSentence();
+                      else if (currentSceneId < currentStoryScenes.length) handleNextScene();
+                    }}
+                    disabled={currentSceneId === currentStoryScenes.length && safeSentenceIndex === currentSentences.length - 1}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center text-[#102b57] hover:bg-amber-100 disabled:opacity-35 disabled:cursor-not-allowed transition-all"
+                    style={{ borderColor: '#e6c86a', background: '#ffe38a' }}
+                    aria-label="Next page"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => setShowToolsPanel(true)}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all cursor-pointer hover:scale-110"
-                    style={{ background: '#fde68a', border: '1px solid #f59e0b' }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all cursor-pointer hover:scale-110"
+                    style={{ background: '#e5e9ff', border: '1px solid #b9c4f5' }}
                     title="Open Story Tools"
                   >
                     🛠️
@@ -593,7 +619,7 @@ export default function App() {
               </div>
 
               {/* READING AREA */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4 min-h-0">
+              <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4 min-h-0">
 
                 {/* Speaker label */}
                 <div className="flex items-center gap-2">
@@ -608,7 +634,7 @@ export default function App() {
                       : currentSentence?.speaker === 'BENNY' ? '🐻'
                       : '📖'}
                   </span>
-                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                  <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#7185a4]">
                     {currentSentence?.speaker === 'LILY' ? 'Lily Doll'
                       : currentSentence?.speaker === 'GIRL' ? 'Little Girl'
                       : currentSentence?.speaker === 'RABBIT' ? 'Teacup Rabbit'
@@ -621,11 +647,11 @@ export default function App() {
                       : currentSentence?.speaker === 'AARAV' ? 'Aarav'
                       : 'Narrator'}
                   </span>
-                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, #f0e4c0, transparent)' }} />
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, #e6dcc8, transparent)' }} />
                 </div>
 
                 {/* STORY SENTENCES — big, prominent, immersive */}
-                <div className="flex flex-col gap-3 font-['Fredoka',sans-serif]">
+                <div className="flex flex-col gap-3 font-['Fredoka',sans-serif] max-w-[620px]">
                   {currentSentences.map((sent, idx) => {
                     const isCurrent = idx === safeSentenceIndex;
                     const isPast = idx < safeSentenceIndex;
@@ -635,7 +661,7 @@ export default function App() {
                         onClick={() => setCurrentSentenceIndex(idx)}
                         className={`cursor-pointer transition-all duration-300 leading-relaxed ${
                           isCurrent
-                            ? 'text-xl md:text-2xl font-bold text-slate-900'
+                            ? 'text-xl md:text-[23px] font-black text-[#102b57]'
                             : isPast
                             ? 'text-sm font-medium text-slate-300 hover:text-slate-500'
                             : 'text-sm font-medium text-slate-400 hover:text-slate-600'
@@ -672,7 +698,7 @@ export default function App() {
               {/* PAGE-TURN NAVIGATION */}
               <div
                 className="shrink-0 px-5 py-3 flex items-center justify-between gap-2 border-t"
-                style={{ background: 'rgba(253,246,224,0.85)', borderColor: '#f0e4c0' }}
+                style={{ background: 'rgba(255,250,239,0.92)', borderColor: '#ead7b4' }}
               >
                 {/* ← Prev */}
                 <button
@@ -682,8 +708,8 @@ export default function App() {
                     else if (currentSceneId > 1) handlePrevScene();
                   }}
                   disabled={currentSceneId === 1 && safeSentenceIndex === 0}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full font-bold text-sm text-slate-600 hover:text-slate-900 hover:bg-amber-100 border transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                  style={{ borderColor: '#e8d5a0' }}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-sm text-slate-500 hover:text-slate-900 hover:bg-white border transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  style={{ borderColor: '#eee3cf', background: '#fffdf8' }}
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline text-xs">{safeSentenceIndex === 0 ? 'Prev' : 'Back'}</span>
@@ -746,7 +772,7 @@ export default function App() {
                       style={{
                         background: isAtVeryEnd
                           ? 'linear-gradient(135deg, #22c55e, #16a34a)'
-                          : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                          : 'linear-gradient(135deg, #ffb11b, #f28b00)',
                         boxShadow: isAtVeryEnd ? '0 3px 10px rgba(34,197,94,0.4)' : '0 3px 10px rgba(245,158,11,0.35)'
                       }}
                     >
