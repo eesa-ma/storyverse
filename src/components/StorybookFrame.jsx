@@ -89,17 +89,17 @@ export default function StorybookFrame({
     <div
       className={`relative w-full h-full min-h-0 transition-all duration-500 select-none ${isFullscreen
         ? 'fixed inset-0 z-50 bg-sky-950 flex items-center justify-center p-4'
-        : 'rounded-l-3xl rounded-r-none p-2 md:p-3 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 border-y-4 border-l-8 border-r-2 border-amber-700 shadow-2xl book-paper-stack-left flex flex-col justify-between'
+        : 'flex flex-col justify-between'
         }`}
     >
       {/* PARCHMENT STORYBOOK LEFT PAGE */}
-      <div className="relative w-full h-full rounded-l-2xl rounded-r-sm parchment-page border-l-2 border-y border-amber-200/80 shadow-inner overflow-hidden flex flex-col justify-between">
+      <div className="relative w-full h-full overflow-hidden flex flex-col justify-between">
 
         {/* STORYBOOK TOP HEADER & BOOKMARK */}
-        <div className="absolute top-0 inset-x-0 z-40 bg-gradient-to-b from-[#fffdf8]/95 via-[#fffdf8]/80 to-transparent px-4 py-2.5 flex items-center justify-between pointer-events-auto border-b border-amber-300/40">
+        <div className="absolute top-0 inset-x-0 z-40 px-3 md:px-4 pt-2.5 flex items-center justify-between pointer-events-auto">
           <div className="flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-amber-600 fill-amber-500 drop-shadow-sm animate-bounce" />
-            <span className="bg-amber-100/90 text-amber-950 font-['Fredoka',sans-serif] font-black px-3.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-amber-300 shadow-sm tracking-wide">
+            <Bookmark className="w-4 h-4 text-amber-700 fill-amber-500 drop-shadow-sm" />
+            <span className="bg-[#fff0bd]/95 text-[#1b2e50] font-['Fredoka',sans-serif] font-black px-3 py-1.5 rounded-full text-[10px] md:text-xs flex items-center gap-1.5 border border-[#f1c95a] shadow-md tracking-wide">
               <BookOpen className="w-4 h-4 text-amber-700" />
               <span>CHAPTER {scene.id} • {scene.title}</span>
             </span>
@@ -108,17 +108,17 @@ export default function StorybookFrame({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsFullscreen(prev => !prev)}
-              className="bg-amber-100/90 hover:bg-amber-200 p-1.5 rounded-xl border border-amber-300 text-amber-950 shadow-sm transition-transform hover:scale-105 cursor-pointer"
+              className="bg-[#132b4f]/90 hover:bg-[#1b3c6e] px-2 py-1 rounded-xl border border-white/40 text-white shadow-md transition-transform hover:scale-105 cursor-pointer text-[10px] font-black"
               title="Toggle Fullscreen Storybook"
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
 
         {/* MAIN ILLUSTRATION CANVAS WITH GOLDEN EMBOSSED FRAME */}
         <div className="relative w-full h-full p-2.5 pt-10 pb-6 flex items-center justify-center">
-          <div className="relative w-full h-full rounded-xl overflow-hidden border-4 border-amber-300/90 shadow-2xl ring-2 ring-amber-900/40 bg-slate-900">
+          <div className="relative w-full h-full rounded-[12px] overflow-hidden border-2 border-[#d9b477] shadow-xl bg-slate-900">
             {activeStoryId === 'curious-rocket' ? (
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 flex flex-col justify-between p-4 overflow-hidden select-none">
                 {/* Floating Stars & Planets */}
@@ -494,7 +494,7 @@ export default function StorybookFrame({
                     className="w-full h-full cursor-pointer group flex items-start justify-end p-2"
                     title="Click to draw on Chalkboard!"
                   >
-                    <span className="text-yellow-300 text-[11px] font-bold bg-emerald-950/90 px-3 py-1 rounded-full border border-yellow-400/70 shadow-lg group-hover:scale-105 transition-transform flex items-center gap-1.5">
+                    <span className="text-white text-[10px] font-black bg-[#162b46]/95 px-3 py-1.5 rounded-full border border-white/30 shadow-lg group-hover:scale-105 transition-transform flex items-center gap-1.5">
                       ✏️ Draw on Board
                     </span>
                   </div>
@@ -531,22 +531,22 @@ export default function StorybookFrame({
 
             {/* STORYTELLER ANIMATED SUBTITLE BANNER OVERLAY */}
             {currentSentence && (
-              <div className="absolute bottom-2 inset-x-3 z-40 bg-sky-950/90 border-2 border-amber-300 p-2 md:p-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center justify-between gap-2.5 animate-fade-in pointer-events-none font-['Fredoka',sans-serif]">
+              <div className="absolute bottom-2 inset-x-3 z-40 bg-white/95 border-2 border-[#e6d7bd] p-2 md:p-2.5 rounded-[18px] shadow-2xl backdrop-blur-md flex items-center justify-between gap-2.5 animate-fade-in pointer-events-none font-['Fredoka',sans-serif]">
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-base animate-bounce">
                     {speaker === 'BOTTLE' ? '💧' : speaker === 'AARAV' ? '👦' : '🎙️'}
                   </span>
-                  <span className="text-[10px] md:text-xs font-black uppercase tracking-wider text-amber-950 bg-amber-300 px-2 py-0.5 rounded-md border border-amber-400 shadow-2xs">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-wider text-[#172d50] bg-[#ffd84d] px-2 py-0.5 rounded-md border border-[#efbd24] shadow-2xs">
                     {speaker === 'BOTTLE' ? 'Buddy' : speaker === 'AARAV' ? 'Aarav' : 'Narrator'}
                   </span>
                 </div>
 
-                <p className="text-xs md:text-sm font-bold text-amber-100 leading-snug truncate flex-1 text-left drop-shadow-sm">
+                <p className="text-xs md:text-sm font-bold text-[#395272] leading-snug truncate flex-1 text-left">
                   "{currentSentence.text}"
                 </p>
 
-                <div className="flex items-center gap-1 text-amber-300 text-[11px] shrink-0 font-black">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+                <div className="flex items-center gap-1 text-[#1b2e50] bg-[#ffd84d] px-2 py-1 rounded-xl text-[10px] shrink-0 font-black">
+                  <BookOpen className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">STORY MODE</span>
                 </div>
               </div>
@@ -555,7 +555,7 @@ export default function StorybookFrame({
         </div>
 
         {/* PAGE NUMBER AT BOTTOM OUTER CORNER */}
-        <div className="px-4 pb-1.5 pt-1 flex items-center justify-between text-[10px] md:text-[11px] font-['Fredoka',sans-serif] font-black text-amber-900/80 border-t border-amber-200/50">
+        <div className="px-4 pb-1.5 pt-1 flex items-center justify-between text-[10px] md:text-[11px] font-['Fredoka',sans-serif] font-black text-[#704323]/80 border-t border-[#e8c77b]/50">
           <span>❖ ILLUSTRATION PAGE</span>
           <span>PAGE {scene.id * 2 - 1}</span>
         </div>

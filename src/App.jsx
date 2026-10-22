@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, Volume2, Mic, MicOff, HelpCircle, Award, TrendingUp, Drama, BookMarked, Sparkles, ArrowLeft, ArrowRight, Play, Pause, X, Wrench } from 'lucide-react';
 import Navbar from './components/Navbar';
 import StorybookFrame from './components/StorybookFrame';
-import SceneControls from './components/SceneControls';
 import InteractivePanel from './components/InteractivePanel';
 import StoryChapterMap from './components/StoryChapterMap';
 import HomePage from './components/HomePage';
@@ -11,12 +10,10 @@ import WordMagicModal from './components/WordMagicModal';
 import ColoringEaselModal from './components/ColoringEaselModal';
 import TrophyChestModal, { BADGES_LIST } from './components/TrophyChestModal';
 import MemoryGameModal from './components/MemoryGameModal';
-import VoiceRecorderWidget from './components/VoiceRecorderWidget';
 import BedtimeCalmOverlay from './components/BedtimeCalmOverlay';
 import StoryMakerModal from './components/StoryMakerModal';
 import StoryQuizModal from './components/StoryQuizModal';
 import CareCertificateModal from './components/CareCertificateModal';
-import SoundboardWidget from './components/SoundboardWidget';
 import SoundscapeMixerModal from './components/SoundscapeMixerModal';
 import StickerStageModal from './components/StickerStageModal';
 import ReadingPassportModal from './components/ReadingPassportModal';
@@ -71,7 +68,6 @@ export default function App() {
   const [showPuppetStageModal, setShowPuppetStageModal] = useState(false);
   const [showReadingPassportModal, setShowReadingPassportModal] = useState(false);
   const [showStoryArcModal, setShowStoryArcModal] = useState(false);
-  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   const [showToolsPanel, setShowToolsPanel] = useState(false);
 
   // FX & Animation States
@@ -82,8 +78,8 @@ export default function App() {
 
   const autoPlayTimeoutRef = useRef(null);
 
-  const currentScene = currentStoryScenes.find(s => s.id === currentSceneId) || currentStoryScenes[0];
-  const currentSentences = currentScene.sentences || [];
+  const currentScene = currentStoryScenes.find(s => s.id === currentSceneId) || currentStoryScenes[0] || STORY_SCENES[0];
+  const currentSentences = Array.isArray(currentScene?.sentences) ? currentScene.sentences : [];
 
   // Safely clamp sentence index within bounds
   const safeSentenceIndex = Math.min(currentSentenceIndex, Math.max(0, currentSentences.length - 1));
@@ -148,11 +144,18 @@ export default function App() {
         }
       });
     } else if (isAutoPlayActive) {
-      const timerMs = Math.max(2500, currentSentence.text.length * 80);
+      const timerMs = Math.max(2500, (currentSentence.text || '').length * 80);
       autoPlayTimeoutRef.current = setTimeout(() => {
         handleNextSentenceAuto();
       }, timerMs);
     }
+
+    return () => {
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+        autoPlayTimeoutRef.current = null;
+      }
+    };
   }, [activeView, currentSceneId, safeSentenceIndex, narratorEnabled, isAutoPlayActive]);
 
   const handleNextSentenceAuto = () => {
@@ -335,6 +338,9 @@ export default function App() {
     setActiveStoryId(storyId);
     setCurrentSceneId(1);
     setCurrentSentenceIndex(0);
+    setWaterStep(0);
+    setShowSparkle(false);
+    setShowRocketLaunch(false);
     setIsAutoPlayActive(false);
     setActiveView('reader');
     soundFX.playSparkle();
@@ -401,7 +407,6 @@ export default function App() {
         <CuteStoryChatbot onSelectStory={handleSelectStory} />
 
         {/* Global Sound Lab Synthesizer Foley Widget */}
-        <SoundboardWidget onOpenSoundscapeMixer={() => setShowSoundscapeModal(true)} />
 
         {/* Floating Educational Feature Modals */}
         {activeWordMagic && (
@@ -531,7 +536,7 @@ export default function App() {
 
         {/* MAIN STORYBOOK CARD */}
         <div
-          className={`w-full rounded-3xl relative flex flex-col overflow-hidden ${isBedtimeMode ? 'border-2 border-indigo-500' : ''}`}
+          className={`reader-spread w-full rounded-3xl relative flex flex-col overflow-hidden ${isBedtimeMode ? 'border-2 border-indigo-500' : ''}`}
           style={!isBedtimeMode ? {
             background: 'white',
             border: '2.5px solid #bae6fd',
@@ -540,7 +545,7 @@ export default function App() {
         >
 
           {/* ALWAYS SIDE-BY-SIDE 2-PAGE OPEN STORYBOOK SPREAD */}
-          <div className="grid grid-cols-12 gap-0 items-stretch w-full flex-1 min-h-0 relative rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-12 gap-0 items-stretch w-full h-full flex-1 min-h-0 relative rounded-3xl overflow-hidden">
 
             {/* LEFT PAGE: PICTURE STORYBOOK ILLUSTRATION */}
             <div className="col-span-6 h-full min-h-0 flex flex-col justify-center relative overflow-hidden">
@@ -561,7 +566,7 @@ export default function App() {
 
             {/* RIGHT PAGE: IMMERSIVE STORYBOOK PAGE */}
             <div
-              className="col-span-6 flex flex-col relative select-none overflow-hidden"
+              className="col-span-6 h-full min-h-0 flex flex-col relative select-none overflow-hidden"
               style={{ background: 'linear-gradient(180deg, #fffef7 0%, #fdf9ee 60%, #faf5e4 100%)' }}
             >
               {/* CHAPTER HEADER — thin elegant stripe */}
@@ -688,11 +693,6 @@ export default function App() {
                 />
 
                 {/* VOICE RECORDER */}
-                {showVoiceRecorder && (
-                  <div className="animate-fadeIn">
-                    <VoiceRecorderWidget currentSentenceText={currentSentence?.text} />
-                  </div>
-                )}
               </div>
 
               {/* PAGE-TURN NAVIGATION */}
@@ -839,13 +839,7 @@ export default function App() {
                   { icon: '🃏', label: 'Game', onClick: () => { setShowMemoryGameModal(true); setShowToolsPanel(false); } },
                   { icon: '✨', label: 'Maker', onClick: () => { setShowStoryMakerModal(true); setShowToolsPanel(false); } },
                   { icon: '❓', label: 'Quiz', onClick: () => { setShowQuizModal(true); setShowToolsPanel(false); } },
-                  { icon: '🏅', label: 'Award', onClick: () => { setShowCareCertificateModal(true); setShowToolsPanel(false); } },
-                  { icon: '🎭', label: 'Puppet', onClick: () => { setShowPuppetStageModal(true); setShowToolsPanel(false); } },
                   { icon: '📓', label: 'Passport', onClick: () => { setShowReadingPassportModal(true); setShowToolsPanel(false); } },
-                  { icon: '🎧', label: 'Mixer', onClick: () => { setShowSoundscapeModal(true); setShowToolsPanel(false); } },
-                  { icon: '📊', label: 'Story Arc', onClick: () => { setShowStoryArcModal(true); setShowToolsPanel(false); } },
-                  { icon: '🎤', label: 'Record', onClick: () => { setShowVoiceRecorder(p => !p); setShowToolsPanel(false); } },
-                  { icon: '🔊', label: 'Read Aloud', onClick: () => { if (currentSentence && narratorEnabled) narrator.speakSentence(currentSentence); setShowToolsPanel(false); } },
                 ].map((tool) => (
                   <button
                     key={tool.label}
@@ -946,7 +940,6 @@ export default function App() {
         )}
 
         {/* Global Sound Lab Synthesizer Foley Widget */}
-        <SoundboardWidget onOpenSoundscapeMixer={() => setShowSoundscapeModal(true)} />
       </main>
     </div>
   );

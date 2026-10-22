@@ -14,6 +14,20 @@ body {
   color: #1e293b;
 }
 
+/* Keep every story scene aligned to the same largest reading spread. */
+.reader-spread {
+  height: clamp(400px, calc(100vh - 250px), 540px);
+  min-height: 0;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 767px) {
+  .reader-spread {
+    height: auto;
+    min-height: 620px;
+  }
+}
+
 /* Flex & Grid Utilities */
 .flex {
   display: flex;
