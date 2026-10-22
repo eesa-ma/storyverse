@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Home, Trophy, Palette, Gamepad2, Sparkles, HelpCircle, Award,
-  Drama, BookMarked, Headphones, Play, Pause,
+  Home, Play, Pause,
   Volume2, VolumeX, Mic, MicOff, Maximize2, Minimize2,
-  BookOpen, Wand2, Droplets
+  BookOpen, Wand2, Droplets, Sparkles, Drama
 } from 'lucide-react';
 import { soundFX } from '../services/soundEffects';
 
@@ -21,24 +20,6 @@ function IconBadge({ bg, children }) {
   );
 }
 
-/* ────────────────────────────────────────────────
-   Flat feature button: coloured icon circle + label
-   ──────────────────────────────────────────────── */
-function FeatBtn({ iconBg, Icon, label, onClick, className = '' }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full cursor-pointer select-none active:scale-95 transition-transform shrink-0
-        bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm ${className}`}
-      style={{ fontFamily: "'Fredoka', sans-serif" }}
-    >
-      <IconBadge bg={iconBg}>
-        <Icon className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-      </IconBadge>
-      <span className="text-[12px] font-bold text-slate-700 whitespace-nowrap">{label}</span>
-    </button>
-  );
-}
 
 export default function Navbar({
   currentSceneId,
@@ -51,15 +32,6 @@ export default function Navbar({
   onToggleAutoPlay = () => {},
   onGoHome = () => {},
   activeStoryTitle = 'The Bottle That Waited',
-  onOpenBadges = () => {},
-  onOpenEasel = () => {},
-  onOpenMemoryGame = () => {},
-  onOpenStoryMaker = () => {},
-  onOpenQuiz = () => {},
-  onOpenCareCertificate = () => {},
-  onOpenPuppetTheater = () => {},
-  onOpenPassport = () => {},
-  onOpenSoundscape = () => {},
   unlockedBadgesCount = 0,
 }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -133,76 +105,8 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* ── MIDDLE: Feature Buttons (single row, clips on overflow) ── */}
-        <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-
-          <FeatBtn
-            iconBg="#f59e0b"
-            Icon={Trophy}
-            label={`Badges${unlockedBadgesCount > 0 ? ` (${unlockedBadgesCount})` : ''}`}
-            onClick={() => { soundFX.playSparkle(); onOpenBadges(); }}
-          />
-
-          <FeatBtn
-            iconBg="#ec4899"
-            Icon={Palette}
-            label="Color"
-            onClick={() => { soundFX.playPop(); onOpenEasel(); }}
-          />
-
-          <FeatBtn
-            iconBg="#10b981"
-            Icon={Gamepad2}
-            label="Game"
-            onClick={() => { soundFX.playPop(); onOpenMemoryGame(); }}
-          />
-
-          <FeatBtn
-            iconBg="#8b5cf6"
-            Icon={Sparkles}
-            label="Maker"
-            onClick={() => { soundFX.playMagicChime?.(); onOpenStoryMaker(); }}
-          />
-
-          <FeatBtn
-            iconBg="#7c3aed"
-            Icon={HelpCircle}
-            label="Quiz"
-            onClick={() => { soundFX.playPop(); onOpenQuiz(); }}
-          />
-
-          <FeatBtn
-            iconBg="#f97316"
-            Icon={Award}
-            label="Award"
-            className="hidden sm:flex"
-            onClick={() => { soundFX.playSparkle(); onOpenCareCertificate(); }}
-          />
-
-          <FeatBtn
-            iconBg="#db2777"
-            Icon={Drama}
-            label="Puppet"
-            className="hidden md:flex"
-            onClick={() => { soundFX.playPop(); onOpenPuppetTheater(); }}
-          />
-
-          <FeatBtn
-            iconBg="#0d9488"
-            Icon={BookMarked}
-            label="Passport"
-            className="hidden xl:flex"
-            onClick={() => { soundFX.playSparkle(); onOpenPassport(); }}
-          />
-
-          <FeatBtn
-            iconBg="#0284c7"
-            Icon={Headphones}
-            label="Mixer"
-            className="hidden 2xl:flex"
-            onClick={() => { soundFX.playSparkle(); onOpenSoundscape(); }}
-          />
-        </div>
+        {/* ── MIDDLE: spacer ── */}
+        <div className="flex-1" />
 
         {/* ── RIGHT: Settings ─────────────────────────────── */}
         <div className="flex items-center gap-2 shrink-0">
