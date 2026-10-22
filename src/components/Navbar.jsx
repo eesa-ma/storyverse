@@ -1,6 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Mic, MicOff, Maximize2, Minimize2, Play, Pause, Home, Trophy, Palette, Gamepad2, Moon, Sun, Globe, RotateCw, ChevronDown, Sparkles, HelpCircle, Award } from 'lucide-react';
+import {
+  Home, Trophy, Palette, Gamepad2, Sparkles, HelpCircle, Award,
+  Drama, BookMarked, Headphones, Play, Pause,
+  Volume2, VolumeX, Mic, MicOff, Maximize2, Minimize2,
+  BookOpen, Wand2, Droplets
+} from 'lucide-react';
 import { soundFX } from '../services/soundEffects';
+
+/* ────────────────────────────────────────────────
+   Small coloured circle badge that holds an icon
+   ──────────────────────────────────────────────── */
+function IconBadge({ bg, children }) {
+  return (
+    <span
+      className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+      style={{ background: bg }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/* ────────────────────────────────────────────────
+   Flat feature button: coloured icon circle + label
+   ──────────────────────────────────────────────── */
+function FeatBtn({ iconBg, Icon, label, onClick, className = '' }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full cursor-pointer select-none active:scale-95 transition-transform shrink-0
+        bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm ${className}`}
+      style={{ fontFamily: "'Fredoka', sans-serif" }}
+    >
+      <IconBadge bg={iconBg}>
+        <Icon className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+      </IconBadge>
+      <span className="text-[12px] font-bold text-slate-700 whitespace-nowrap">{label}</span>
+    </button>
+  );
+}
 
 export default function Navbar({
   currentSceneId,
@@ -10,330 +48,220 @@ export default function Navbar({
   narratorEnabled,
   onToggleNarrator,
   isAutoPlayActive = false,
-  onToggleAutoPlay = () => { },
-  onGoHome = () => { },
-  activeStoryTitle = "The Bottle That Waited",
-  onOpenBadges = () => { },
-  onOpenEasel = () => { },
-  onOpenMemoryGame = () => { },
-  onOpenStoryMaker = () => { },
-  onOpenQuiz = () => { },
-  onOpenCareCertificate = () => { },
-  onOpenPuppetTheater = () => { },
-  onOpenPassport = () => { },
-  onOpenSoundscape = () => { },
-  isBedtimeMode = false,
-  onToggleBedtimeMode = () => { },
-  activeLanguage = 'en',
-  onChangeLanguage = () => { },
-  unlockedBadgesCount = 0
+  onToggleAutoPlay = () => {},
+  onGoHome = () => {},
+  activeStoryTitle = 'The Bottle That Waited',
+  onOpenBadges = () => {},
+  onOpenEasel = () => {},
+  onOpenMemoryGame = () => {},
+  onOpenStoryMaker = () => {},
+  onOpenQuiz = () => {},
+  onOpenCareCertificate = () => {},
+  onOpenPuppetTheater = () => {},
+  onOpenPassport = () => {},
+  onOpenSoundscape = () => {},
+  unlockedBadgesCount = 0,
 }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
-    const handleFsChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFsChange);
-    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+    const h = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', h);
+    return () => document.removeEventListener('fullscreenchange', h);
   }, []);
 
   const toggleFullScreen = () => {
     soundFX.playPop();
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(err => console.log(err));
+      document.documentElement.requestFullscreen().catch(() => {});
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+      document.exitFullscreen?.();
     }
   };
 
-  const LANGUAGES = [
-    { code: 'en', flag: '🇬🇧', label: 'English' },
-    { code: 'es', flag: '🇪🇸', label: 'Español' },
-    { code: 'fr', flag: '🇫🇷', label: 'Français' },
-    { code: 'hi', flag: '🇮🇳', label: 'Hindi' }
-  ];
+
+
+  // Story icon by title keyword
+  const StoryIcon =
+    activeStoryTitle.toLowerCase().includes('dolly') ? Drama
+    : activeStoryTitle.toLowerCase().includes('cave') ? Wand2
+    : activeStoryTitle.toLowerCase().includes('rocket') ? Sparkles
+    : Droplets;
 
   return (
-    <header 
-      className="sticky top-0 z-40 w-full h-[70px] md:h-[80px] flex items-center px-2 md:px-6 select-none font-['Fredoka',sans-serif] bg-gradient-to-r from-[#c9803b] via-[#eed1a4] to-[#c9803b] shadow-md"
+    <header
+      className="sticky top-0 z-40 w-full overflow-hidden"
       style={{
-        borderBottom: "6px solid #8b5a2b"
+        background: '#ffffff',
+        borderBottom: '1.5px solid #e2e8f0',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+        height: '56px',
+        fontFamily: "'Fredoka', sans-serif",
       }}
     >
-      <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-2 h-full py-2">
+      <div className="h-full flex items-center gap-2 px-3 md:px-4">
 
-        {/* --- LEFT GROUP --- */}
-        <div className="flex items-center gap-3 h-full">
-          
-          {/* Library Button - Wood 3D */}
+        {/* ── LEFT: Library + Story Title ────────────────── */}
+        <div className="flex items-center gap-2 shrink-0">
+
+          {/* Library */}
           <button
-            onClick={() => {
-              soundFX.playPop();
-              onGoHome();
-            }}
-            className="h-full px-4 md:px-5 rounded-2xl flex items-center gap-2 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#6b421a] bg-gradient-to-b from-[#e39c4d] to-[#b36e26] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),0_4px_6px_rgba(0,0,0,0.3)]"
-            title="Return to Storyverse Library"
+            onClick={() => { soundFX.playPop(); onGoHome(); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 transition-all cursor-pointer shrink-0"
           >
-            <Home className="w-5 h-5 md:w-6 md:h-6 text-[#4a2e12]" strokeWidth={2.5} />
-            <span className="text-[#4a2e12] font-black text-sm md:text-base tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">Library</span>
-            <span className="text-base hidden sm:inline drop-shadow-sm">📚</span>
+            <IconBadge bg="#64748b">
+              <Home className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+            </IconBadge>
+            <span className="text-[13px] font-black text-slate-800 whitespace-nowrap">Library</span>
           </button>
 
-          {/* Story Title - Parchment 3D */}
-          <div className="hidden lg:flex items-center h-full px-5 rounded-2xl border-[3px] border-[#cbb389] bg-gradient-to-b from-[#fffbf0] to-[#f4e4c4] shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_4px_6px_rgba(0,0,0,0.2)] relative">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl drop-shadow-md">
-                {activeStoryTitle.includes('Dolly') ? '🎀' :
-                 activeStoryTitle.includes('Cave') ? '🦊' :
-                 activeStoryTitle.includes('Rocket') ? '🚀' :
-                 activeStoryTitle.includes('Bear') ? '🐻' : '💧'}
+          {/* Story title pill — visible at lg+ */}
+          <div
+            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-100 bg-white shrink-0"
+          >
+            <IconBadge bg="#38bdf8">
+              <StoryIcon className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+            </IconBadge>
+            <div className="flex flex-col leading-none">
+              <span className="text-[13px] font-black text-slate-800 whitespace-nowrap max-w-[160px] truncate">
+                {activeStoryTitle}
               </span>
-              <div className="flex flex-col justify-center">
-                <h1 className="text-xs md:text-sm font-black text-[#0f4c81] leading-tight tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] max-w-[190px] truncate">
-                  {activeStoryTitle}
-                </h1>
-                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  Interactive Storybook Reader
-                </p>
-              </div>
+              <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                Interactive Storybook Reader
+              </span>
             </div>
           </div>
         </div>
 
-        {/* --- MIDDLE GROUP 1 (Features) --- */}
-        <div className="flex items-center justify-center gap-3 h-full">
-          
-          {/* Badges Button - Gold 3D */}
-          <button
-            onClick={() => {
-              soundFX.playSparkle();
-              onOpenBadges();
-            }}
-            className="h-full px-4 md:px-5 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#b57317] bg-gradient-to-b from-[#ffd65e] to-[#ffaa1c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-          >
-            <Trophy className="w-5 h-5 text-[#7a4e10]" strokeWidth={2.5} />
-            <span className="text-[#7a4e10] font-black text-sm md:text-base drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]">Badges</span>
-          </button>
+        {/* ── MIDDLE: Feature Buttons (single row, clips on overflow) ── */}
+        <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
 
-          {/* Color Button - Pink 3D */}
-          <button
-            onClick={() => {
-              soundFX.playPop();
-              onOpenEasel();
-            }}
-            className="h-full px-4 md:px-5 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#942753] bg-gradient-to-b from-[#ff8fc3] to-[#e84d8d] shadow-[inset_0_2px_4px_rgba(255,255,255,0.5),0_4px_6px_rgba(0,0,0,0.2)]"
-          >
-            <Palette className="w-5 h-5 text-[#6b1638]" strokeWidth={2.5} />
-            <span className="text-[#6b1638] font-black text-sm md:text-base drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">Color</span>
-          </button>
+          <FeatBtn
+            iconBg="#f59e0b"
+            Icon={Trophy}
+            label={`Badges${unlockedBadgesCount > 0 ? ` (${unlockedBadgesCount})` : ''}`}
+            onClick={() => { soundFX.playSparkle(); onOpenBadges(); }}
+          />
 
-          {/* Game Button - Green 3D */}
-          <button
-            onClick={() => {
-              soundFX.playPop();
-              onOpenMemoryGame();
-            }}
-            className="h-full px-3.5 md:px-4 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#197554] bg-gradient-to-b from-[#7cf5c8] to-[#2bc08e] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-          >
-            <Gamepad2 className="w-5 h-5 text-[#11543b]" strokeWidth={2.5} />
-            <span className="text-[#11543b] font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]">Game</span>
-          </button>
+          <FeatBtn
+            iconBg="#ec4899"
+            Icon={Palette}
+            label="Color"
+            onClick={() => { soundFX.playPop(); onOpenEasel(); }}
+          />
 
-          {/* Story Maker Button - Royal Indigo 3D */}
-          <button
-            onClick={() => {
-              soundFX.playMagicChime();
-              onOpenStoryMaker();
-            }}
-            className="h-full px-3.5 md:px-4 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#312e81] bg-gradient-to-b from-[#818cf8] to-[#4f46e5] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Create your own custom story!"
-          >
-            <Sparkles className="w-4 h-4 text-white" strokeWidth={2.5} />
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Maker</span>
-          </button>
+          <FeatBtn
+            iconBg="#10b981"
+            Icon={Gamepad2}
+            label="Game"
+            onClick={() => { soundFX.playPop(); onOpenMemoryGame(); }}
+          />
 
-          {/* Quiz Button - Purple 3D */}
-          <button
-            onClick={() => {
-              soundFX.playPop();
-              onOpenQuiz();
-            }}
-            className="h-full px-3.5 md:px-4 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#6b21a8] bg-gradient-to-b from-[#c084fc] to-[#9333ea] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Test what you learned from the story!"
-          >
-            <HelpCircle className="w-4 h-4 text-white" strokeWidth={2.5} />
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Quiz</span>
-          </button>
+          <FeatBtn
+            iconBg="#8b5cf6"
+            Icon={Sparkles}
+            label="Maker"
+            onClick={() => { soundFX.playMagicChime?.(); onOpenStoryMaker(); }}
+          />
 
-          {/* Certificate Button - Orange 3D */}
-          <button
-            onClick={() => {
-              soundFX.playSparkle();
-              onOpenCareCertificate();
-            }}
-            className="hidden sm:flex h-full px-3.5 md:px-4 rounded-full items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#9a3412] bg-gradient-to-b from-[#fb923c] to-[#ea580c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Print your Kindness & Reading Award Certificate!"
-          >
-            <Award className="w-4 h-4 text-white" strokeWidth={2.5} />
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Award</span>
-          </button>
+          <FeatBtn
+            iconBg="#7c3aed"
+            Icon={HelpCircle}
+            label="Quiz"
+            onClick={() => { soundFX.playPop(); onOpenQuiz(); }}
+          />
 
-          {/* Puppet Theater Button - Rose/Pink 3D */}
-          <button
-            onClick={() => {
-              soundFX.playPop();
-              onOpenPuppetTheater();
-            }}
-            className="hidden lg:flex h-full px-3.5 md:px-4 rounded-full items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#9d174d] bg-gradient-to-b from-[#f472b6] to-[#db2777] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Direct your own story puppet show!"
-          >
-            <span className="text-sm">🎭</span>
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Puppet</span>
-          </button>
+          <FeatBtn
+            iconBg="#f97316"
+            Icon={Award}
+            label="Award"
+            className="hidden sm:flex"
+            onClick={() => { soundFX.playSparkle(); onOpenCareCertificate(); }}
+          />
 
-          {/* Reading Passport Button - Teal 3D */}
-          <button
-            onClick={() => {
-              soundFX.playSparkle();
-              onOpenPassport();
-            }}
-            className="hidden md:flex h-full px-3.5 md:px-4 rounded-full items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#0f766e] bg-gradient-to-b from-[#2dd4bf] to-[#0d9488] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Open your Storyverse Reading Passport!"
-          >
-            <span className="text-sm">📓</span>
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Passport</span>
-          </button>
+          <FeatBtn
+            iconBg="#db2777"
+            Icon={Drama}
+            label="Puppet"
+            className="hidden md:flex"
+            onClick={() => { soundFX.playPop(); onOpenPuppetTheater(); }}
+          />
 
-          {/* Atmosphere Mixer Button - Cyan/Blue 3D */}
-          <button
-            onClick={() => {
-              soundFX.playSparkle();
-              onOpenSoundscape();
-            }}
-            className="hidden xl:flex h-full px-3.5 md:px-4 rounded-full items-center gap-1.5 active:scale-95 transition-transform cursor-pointer border-[3px] border-[#0369a1] bg-gradient-to-b from-[#38bdf8] to-[#0284c7] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)]"
-            title="Blend calming ambient soundscapes!"
-          >
-            <span className="text-sm">🎧</span>
-            <span className="text-white font-black text-xs md:text-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Mixer</span>
-          </button>
+          <FeatBtn
+            iconBg="#0d9488"
+            Icon={BookMarked}
+            label="Passport"
+            className="hidden xl:flex"
+            onClick={() => { soundFX.playSparkle(); onOpenPassport(); }}
+          />
+
+          <FeatBtn
+            iconBg="#0284c7"
+            Icon={Headphones}
+            label="Mixer"
+            className="hidden 2xl:flex"
+            onClick={() => { soundFX.playSparkle(); onOpenSoundscape(); }}
+          />
         </div>
 
-        {/* --- MIDDLE GROUP 2 (Settings) --- */}
-        <div className="flex items-center justify-center gap-3 h-full">
-          {/* Daytime Toggle - Parchment 3D */}
-          <div className="hidden xl:flex items-center h-full px-4 rounded-2xl border-[3px] border-[#cbb389] bg-gradient-to-b from-[#fffbf0] to-[#f4e4c4] shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_4px_6px_rgba(0,0,0,0.2)] gap-2">
-            <Sun className="w-5 h-5 text-[#ed8924] fill-[#ed8924] drop-shadow-sm" />
-            <span className="text-[#5c4a3d] font-black text-sm md:text-base">Daytime</span>
-            <button 
-              onClick={() => {
-                soundFX.playPop();
-                onToggleBedtimeMode();
-              }}
-              className={`w-12 h-6 rounded-full relative transition-colors duration-300 border-2 border-transparent ${!isBedtimeMode ? 'bg-[#4396f6]' : 'bg-slate-400'} shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]`}
-            >
-              <div className={`absolute top-[2px] w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-300 ${!isBedtimeMode ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
-          </div>
+        {/* ── RIGHT: Settings ─────────────────────────────── */}
+        <div className="flex items-center gap-2 shrink-0">
 
-          {/* Language Toggle - Parchment 3D */}
-          <div className="hidden xl:flex items-center h-full px-4 rounded-2xl border-[3px] border-[#cbb389] bg-gradient-to-b from-[#fffbf0] to-[#f4e4c4] shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_4px_6px_rgba(0,0,0,0.2)] gap-1 cursor-pointer">
-            <Globe className="w-5 h-5 text-[#5c4a3d]" strokeWidth={2.5} />
-            <select
-              value={activeLanguage}
-              onChange={(e) => {
-                soundFX.playPop();
-                onChangeLanguage(e.target.value);
-              }}
-              className="bg-transparent text-[#5c4a3d] font-black text-sm outline-none cursor-pointer appearance-none pr-1 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
-            >
-              {LANGUAGES.map(l => (
-                <option key={l.code} value={l.code}>
-                  GB {l.code.toUpperCase()}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-[#5c4a3d] pointer-events-none" strokeWidth={3} />
-          </div>
-        </div>
 
-        {/* --- RIGHT GROUP (Controls) --- */}
-        <div className="flex items-center justify-end gap-3 h-full">
-          
-          {/* Auto-Play Button - Blue Glossy 3D */}
+          {/* Sound */}
           <button
-            onClick={() => {
-              soundFX.playPop();
-              onToggleAutoPlay();
-            }}
-            className={`h-full px-5 rounded-full flex items-center gap-2 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5),0_4px_6px_rgba(0,0,0,0.3)] active:scale-95 transition-transform cursor-pointer border-[3px] border-[#094794] ${
-              isAutoPlayActive 
-                ? 'bg-gradient-to-b from-[#5c9ce6] to-[#2068b8] animate-pulse' 
-                : 'bg-gradient-to-b from-[#4bc1ff] to-[#0d74e8]'
-            }`}
+            onClick={() => { soundFX.playPop(); onToggleSound(); }}
+            title={soundMuted ? 'Unmute' : 'Mute'}
+            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
           >
-            {isAutoPlayActive ? (
-               <Pause className="w-5 h-5 text-white fill-white drop-shadow-md" />
-            ) : (
-               <Play className="w-5 h-5 text-white fill-white drop-shadow-md" />
-            )}
-            <span className="text-white font-black text-sm md:text-base drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">Auto-Play</span>
+            {soundMuted
+              ? <VolumeX className="w-4 h-4 text-slate-400" strokeWidth={2.5} />
+              : <Volume2 className="w-4 h-4 text-emerald-500" strokeWidth={2.5} />}
           </button>
 
-          {/* Refresh/Fullscreen Button - Wood Circle 3D */}
+          {/* Narrator */}
+          <button
+            onClick={() => { soundFX.playPop(); onToggleNarrator(); }}
+            title={narratorEnabled ? 'Narrator On' : 'Narrator Off'}
+            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
+          >
+            {narratorEnabled
+              ? <Mic className="w-4 h-4 text-amber-500" strokeWidth={2.5} />
+              : <MicOff className="w-4 h-4 text-slate-400" strokeWidth={2.5} />}
+          </button>
+
+          {/* Fullscreen */}
           <button
             onClick={toggleFullScreen}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-full border-[3px] border-[#8c5d2c] bg-gradient-to-b from-[#eed4aa] to-[#d4ab75] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)] flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
-            title="Toggle Fullscreen"
+            title="Fullscreen"
+            className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0 hover:bg-slate-50"
           >
-            {isFullscreen ? (
-               <Minimize2 className="w-5 h-5 md:w-6 md:h-6 text-[#6b421a]" strokeWidth={2.5} />
-            ) : (
-               <RotateCw className="w-5 h-5 md:w-6 md:h-6 text-[#6b421a]" strokeWidth={2.5} />
-            )}
+            {isFullscreen
+              ? <Minimize2 className="w-4 h-4 text-slate-500" strokeWidth={2.5} />
+              : <Maximize2 className="w-4 h-4 text-slate-500" strokeWidth={2.5} />}
           </button>
 
-          {/* Sound Toggle - Green Circle 3D */}
+          {/* ── Auto-Play: large blue pill ── */}
           <button
-            onClick={() => {
-              soundFX.playPop();
-              onToggleSound();
-            }}
-            className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-[3px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)] flex items-center justify-center active:scale-95 transition-transform cursor-pointer ${
-              !soundMuted 
-                ? 'bg-gradient-to-b from-[#a1e8ab] to-[#5cb86b] border-[#367a41]' 
-                : 'bg-gradient-to-b from-[#e2e8e3] to-[#b0b8b2] border-[#7a857d]'
+            onClick={() => { soundFX.playPop(); onToggleAutoPlay(); }}
+            className={`flex items-center gap-2 pl-3 pr-4 py-2 rounded-full font-black text-[13px] text-white cursor-pointer active:scale-95 transition-all shrink-0 ${
+              isAutoPlayActive ? 'animate-pulse' : ''
             }`}
-          >
-            {!soundMuted ? (
-              <Volume2 className="w-5 h-5 md:w-6 md:h-6 text-[#1b4d24]" strokeWidth={2.5} />
-            ) : (
-              <VolumeX className="w-5 h-5 md:w-6 md:h-6 text-[#4a544c]" strokeWidth={2.5} />
-            )}
-          </button>
-
-          {/* Narrator Toggle - Gold Circle 3D */}
-          <button
-             onClick={() => {
-              soundFX.playPop();
-              onToggleNarrator();
+            style={{
+              background: isAutoPlayActive
+                ? 'linear-gradient(135deg, #6366f1, #4f46e5)'
+                : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+              boxShadow: '0 3px 14px rgba(59,130,246,0.45)',
             }}
-            className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-[3px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_6px_rgba(0,0,0,0.2)] flex items-center justify-center active:scale-95 transition-transform cursor-pointer ${
-              narratorEnabled 
-                ? 'bg-gradient-to-b from-[#ffd65e] to-[#ffaa1c] border-[#b57317]' 
-                : 'bg-gradient-to-b from-[#e2e8e3] to-[#b0b8b2] border-[#7a857d]'
-            }`}
+            title={isAutoPlayActive ? 'Stop Auto-Play' : 'Start Auto-Play'}
           >
-            {narratorEnabled ? (
-              <Mic className="w-5 h-5 md:w-6 md:h-6 text-[#7a4e10]" strokeWidth={2.5} />
-            ) : (
-              <MicOff className="w-5 h-5 md:w-6 md:h-6 text-[#4a544c]" stroke width={2.5} />
-            )}
+            {isAutoPlayActive
+              ? <Pause className="w-4 h-4 fill-white shrink-0" />
+              : <Play className="w-4 h-4 fill-white shrink-0" />}
+            <span className="whitespace-nowrap">Auto-Play</span>
           </button>
-
         </div>
+
       </div>
     </header>
   );

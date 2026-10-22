@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, Volume2 } from 'lucide-react';
+import { BookOpen, Volume2, Mic, HelpCircle, Award, TrendingUp, Drama, BookMarked, Sparkles } from 'lucide-react';
 import Navbar from './components/Navbar';
 import StorybookFrame from './components/StorybookFrame';
 import SceneControls from './components/SceneControls';
@@ -111,6 +111,7 @@ export default function App() {
 
   // Handle sentence speech narration & auto-play progression
   useEffect(() => {
+    if (activeView !== 'reader') return;
     if (!currentSentence) return;
 
     if (autoPlayTimeoutRef.current) clearTimeout(autoPlayTimeoutRef.current);
@@ -151,7 +152,7 @@ export default function App() {
         handleNextSentenceAuto();
       }, timerMs);
     }
-  }, [currentSceneId, safeSentenceIndex, narratorEnabled, isAutoPlayActive]);
+  }, [activeView, currentSceneId, safeSentenceIndex, narratorEnabled, isAutoPlayActive]);
 
   const handleNextSentenceAuto = () => {
     if (safeSentenceIndex < currentSentences.length - 1) {
@@ -368,7 +369,7 @@ export default function App() {
               title={`Click to explore word magic for "${cleanWord}"!`}
             >
               <span>{w}</span>
-              <span className="text-xs">✨</span>
+              <Sparkles className="w-3 h-3 text-amber-600" />
             </button>
           </span>
         );
@@ -490,22 +491,12 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen w-full flex flex-col justify-between relative text-slate-800 font-['Fredoka',sans-serif] selection:bg-amber-300 overflow-x-hidden pb-6 transition-colors duration-1000 ${isBedtimeMode
+      className={`min-h-screen w-full flex flex-col justify-between relative text-slate-800 font-['Fredoka',sans-serif] selection:bg-sky-200 overflow-x-hidden pb-6 transition-colors duration-1000 ${isBedtimeMode
         ? 'bg-gradient-to-b from-indigo-950 via-slate-900 via-60% to-purple-950 text-slate-100'
-        : 'bg-gradient-to-b from-sky-200 via-amber-50 via-60% to-sky-100'
+        : ''
         }`}
       style={!isBedtimeMode ? {
-        backgroundImage: `
-          radial-gradient(circle at 12% 18%, rgba(254, 240, 138, 0.45) 0%, transparent 25%),
-          radial-gradient(circle at 88% 16%, rgba(244, 114, 182, 0.35) 0%, transparent 25%),
-          radial-gradient(circle at 75% 80%, rgba(147, 197, 253, 0.4) 0%, transparent 30%),
-          radial-gradient(#f472b6 1.8px, transparent 1.8px),
-          radial-gradient(#38bdf8 1.8px, transparent 1.8px),
-          radial-gradient(#facc15 1.8px, transparent 1.8px),
-          linear-gradient(135deg, #e0f2fe 0%, #fffbeb 50%, #fdf2f8 100%)
-        `,
-        backgroundSize: 'auto, auto, auto, 52px 52px, 52px 52px, 52px 52px, 100% 100%',
-        backgroundPosition: '0 0, 0 0, 0 0, 0 0, 26px 26px, 13px 39px, 0 0'
+        background: 'linear-gradient(160deg, #e0f2fe 0%, #f0fdf4 40%, #fef9c3 70%, #fce7f3 100%)'
       } : undefined}
     >
 
@@ -532,21 +523,23 @@ export default function App() {
         onOpenPuppetTheater={() => setShowPuppetStageModal(true)}
         onOpenPassport={() => setShowReadingPassportModal(true)}
         onOpenSoundscape={() => setShowSoundscapeModal(true)}
-        isBedtimeMode={isBedtimeMode}
-        onToggleBedtimeMode={() => setIsBedtimeMode(prev => !prev)}
-        activeLanguage={activeLanguage}
-        onChangeLanguage={setActiveLanguage}
         unlockedBadgesCount={unlockedBadges.length}
       />
 
-      <main className="w-full max-w-7xl mx-auto flex-1 p-3 md:p-6 flex flex-col gap-6 items-stretch z-10">
+      <main className="w-full max-w-7xl mx-auto flex-1 p-3 md:p-5 flex flex-col gap-4 items-stretch z-10">
 
-        {/* FULLSCREEN 3D OPEN STORYBOOK WRAPPER */}
-        <div className={`backdrop-blur-md p-3 md:p-5 w-full rounded-[2.5rem] border-4 shadow-2xl relative flex flex-col ${isBedtimeMode ? 'bg-slate-900/90 border-indigo-500' : 'bg-white/80 border-sky-300'
-          }`}>
+        {/* MAIN STORYBOOK CARD */}
+        <div
+          className={`w-full rounded-3xl relative flex flex-col overflow-hidden ${isBedtimeMode ? 'border-2 border-indigo-500' : ''}`}
+          style={!isBedtimeMode ? {
+            background: 'white',
+            border: '2.5px solid #bae6fd',
+            boxShadow: '0 8px 32px rgba(56,189,248,0.15), 0 2px 8px rgba(0,0,0,0.06)'
+          } : { background: 'rgba(15,23,42,0.95)' }}
+        >
 
           {/* ALWAYS SIDE-BY-SIDE 2-PAGE OPEN STORYBOOK SPREAD */}
-          <div className="grid grid-cols-12 gap-0 items-stretch w-full flex-1 min-h-0 relative rounded-xl overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-12 gap-0 items-stretch w-full flex-1 min-h-0 relative rounded-3xl overflow-hidden">
 
             {/* LEFT PAGE: PICTURE STORYBOOK ILLUSTRATION */}
             <div className="col-span-6 h-full min-h-0 flex flex-col justify-center relative overflow-hidden">
@@ -565,97 +558,99 @@ export default function App() {
             {/* REALISTIC SUNKEN BOOK SPINE / GUTTER */}
             <div className="block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 z-30 pointer-events-none book-spine-gutter shadow-2xl" />
 
-            {/* RIGHT PAGE: AUTHENTIC PRINTED STORY READING PAGE */}
-            <div className="col-span-6 parchment-page rounded-r-3xl rounded-l-none border-y-4 border-r-8 border-l-2 border-amber-700 p-3 md:p-4 shadow-2xl flex flex-col justify-between gap-3 relative select-none book-paper-stack-right overflow-y-auto">
+            {/* RIGHT PAGE: REDESIGNED CLEAN READING PANEL */}
+            <div
+              className="col-span-6 flex flex-col gap-3 p-4 md:p-5 relative select-none overflow-y-auto"
+              style={{ background: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 100%)' }}
+            >
 
-              {/* COMPACT CHAPTER & SPEAKER HEADER */}
-              <div className="flex items-center justify-between pb-1 font-['Fredoka',sans-serif]">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-950 bg-amber-200 px-2.5 py-1 rounded-full shadow-sm shrink-0 flex items-center gap-1">
-                    📖 {currentSentence?.speaker === 'LILY' ? '🎀 Lily Doll' : currentSentence?.speaker === 'GIRL' ? '👧 Little Girl' : currentSentence?.speaker === 'RABBIT' ? '🐰 Teacup Rabbit' : currentSentence?.speaker === 'MILO' ? '🦊 Milo' : currentSentence?.speaker === 'TOBY' ? '🐰 Toby' : currentSentence?.speaker === 'ROCKY' ? '🚀 Rocky' : currentSentence?.speaker === 'COMET' ? '☄️ Starry' : currentSentence?.speaker === 'BENNY' ? '🐻 Benny Bear' : currentSentence?.speaker === 'BOTTLE' ? '💧 Buddy' : currentSentence?.speaker === 'AARAV' ? '👦 Aarav' : 'NARRATOR'}
-                  </span>
-                  <h2 className="text-sm font-bold text-slate-800 tracking-tight truncate">
-                    {currentScene.title}
-                  </h2>
+              {/* TOP CHARACTER + TITLE HEADER */}
+              <div>
+                {/* Speaker badge + mini action pills */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5"
+                      style={{ background: 'linear-gradient(135deg, #fef9c3, #fde68a)', border: '1.5px solid #f59e0b', color: '#78350f' }}
+                    >
+                      <Mic className="w-3 h-3 shrink-0" strokeWidth={2.5} />
+                      {currentSentence?.speaker === 'LILY' ? 'Lily Doll' : currentSentence?.speaker === 'GIRL' ? 'Little Girl' : currentSentence?.speaker === 'RABBIT' ? 'Teacup Rabbit' : currentSentence?.speaker === 'MILO' ? 'Milo' : currentSentence?.speaker === 'TOBY' ? 'Toby' : currentSentence?.speaker === 'ROCKY' ? 'Rocky' : currentSentence?.speaker === 'COMET' ? 'Starry' : currentSentence?.speaker === 'BENNY' ? 'Benny Bear' : currentSentence?.speaker === 'BOTTLE' ? 'Buddy' : currentSentence?.speaker === 'AARAV' ? 'Aarav' : 'Narrator'}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-400">
+                      Line {safeSentenceIndex + 1}/{currentSentences.length}
+                    </span>
+                  </div>
+
+                  {/* Mini action toolbar */}
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                    <button
+                      onClick={() => { soundFX.playPop(); setShowQuizModal(true); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={{ background: '#f3e8ff', borderColor: '#d8b4fe', color: '#7c3aed' }}
+                      title="Story Quiz"
+                    ><HelpCircle className="w-3 h-3" strokeWidth={2.5} /> Quiz</button>
+                    <button
+                      onClick={() => { soundFX.playSparkle(); setShowCareCertificateModal(true); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={{ background: '#fef9c3', borderColor: '#fde68a', color: '#92400e' }}
+                      title="Award Certificate"
+                    ><Award className="w-3 h-3" strokeWidth={2.5} /> Award</button>
+                    <button
+                      onClick={() => { soundFX.playPop(); setShowStoryArcModal(true); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={{ background: '#e0e7ff', borderColor: '#c7d2fe', color: '#3730a3' }}
+                      title="Narrative Arc"
+                    ><TrendingUp className="w-3 h-3" strokeWidth={2.5} /> Arc</button>
+                    <button
+                      onClick={() => { soundFX.playPop(); setShowVoiceRecorder(prev => !prev); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={showVoiceRecorder
+                        ? { background: '#ef4444', borderColor: '#dc2626', color: 'white' }
+                        : { background: '#ffe4e6', borderColor: '#fca5a5', color: '#9f1239' }
+                      }
+                      title="Voice Recorder"
+                    ><Mic className="w-3 h-3" strokeWidth={2.5} /> Record</button>
+                    <button
+                      onClick={() => { soundFX.playPop(); setShowPuppetStageModal(true); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={{ background: '#fce7f3', borderColor: '#f9a8d4', color: '#9d174d' }}
+                      title="Puppet Theater"
+                    ><Drama className="w-3 h-3" strokeWidth={2.5} /> Puppet</button>
+                    <button
+                      onClick={() => { soundFX.playSparkle(); setShowReadingPassportModal(true); }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
+                      style={{ background: '#ccfbf1', borderColor: '#99f6e4', color: '#134e4a' }}
+                      title="Reading Passport"
+                    ><BookMarked className="w-3 h-3" strokeWidth={2.5} /> Passport</button>
+                    <button
+                      className="w-7 h-7 rounded-full flex items-center justify-center border transition-all active:scale-95 cursor-pointer"
+                      style={{ background: '#e0f2fe', borderColor: '#7dd3fc', color: '#0284c7' }}
+                      onClick={() => { if (currentSentence && narratorEnabled) narrator.speakSentence(currentSentence); }}
+                      title="Read this line aloud"
+                    >
+                      <Volume2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <button
-                    onClick={() => {
-                      soundFX.playPop();
-                      setShowQuizModal(true);
-                    }}
-                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-purple-200 flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    title="Take the Story Comprehension Quiz"
-                  >
-                    <span>💡 Quiz</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      soundFX.playSparkle();
-                      setShowCareCertificateModal(true);
-                    }}
-                    className="bg-amber-100 hover:bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full text-[10px] font-bold border border-amber-300 flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    title="Print your Kindness & Reading Award Certificate"
-                  >
-                    <span>🏆 Award</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      soundFX.playPop();
-                      setShowStoryArcModal(true);
-                    }}
-                    className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-indigo-200 flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    title="View Dynamic Emotional Narrative Arc"
-                  >
-                    <span>📈 Arc</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      soundFX.playPop();
-                      setShowVoiceRecorder(prev => !prev);
-                    }}
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer ${
-                      showVoiceRecorder
-                        ? 'bg-rose-500 text-white border-rose-600'
-                        : 'bg-rose-100 hover:bg-rose-200 text-rose-700 border-rose-200'
-                    }`}
-                    title="Record and play back your reading voice!"
-                  >
-                    <span>🎙️ Record</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      soundFX.playPop();
-                      setShowPuppetStageModal(true);
-                    }}
-                    className="bg-pink-100 hover:bg-pink-200 text-pink-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-pink-200 flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    title="Open Puppet Theater & Sticker Studio"
-                  >
-                    <span>🎭 Puppet</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      soundFX.playSparkle();
-                      setShowReadingPassportModal(true);
-                    }}
-                    className="bg-teal-100 hover:bg-teal-200 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-teal-200 flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    title="View Reading Passport & Visas"
-                  >
-                    <span>📓 Passport</span>
-                  </button>
-                  <span className="text-[11px] font-bold text-amber-950 shrink-0 ml-1">
-                    Line {safeSentenceIndex + 1}/{currentSentences.length}
-                  </span>
-                  <button className="bg-sky-100 p-1.5 rounded-full text-sky-600 hover:bg-sky-200 shadow-sm border border-sky-200" onClick={() => {
-                    if (currentSentence && narratorEnabled) narrator.speakSentence(currentSentence);
-                  }}>
-                    <Volume2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+
+                {/* Big Chapter Title */}
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight mb-0.5 flex items-center gap-2">
+                  {currentScene.title}
+                  <Sparkles className="w-5 h-5 text-amber-400 shrink-0" strokeWidth={2} />
+                </h2>
+                {/* Current sentence as subtitle */}
+                {currentSentence && (
+                  <p className="text-sm font-semibold text-slate-500 leading-snug">
+                    {currentSentence.text.length > 80 ? currentSentence.text.slice(0, 80) + '…' : currentSentence.text}
+                  </p>
+                )}
               </div>
 
-              {/* FULL PRINTED STORYBOOK CHAPTER TEXT BLOCK */}
-              <div className="flex flex-col gap-2 font-['Fredoka',sans-serif] px-1">
+              {/* STORY TEXT SENTENCES */}
+              <div
+                className="rounded-2xl p-3 flex flex-col gap-2 font-['Fredoka',sans-serif]"
+                style={{ background: 'linear-gradient(135deg, #fafafa, #f8fafc)', border: '1.5px solid #e2e8f0' }}
+              >
                 {currentSentences.map((sent, idx) => {
                   const isCurrent = idx === safeSentenceIndex;
                   return (
@@ -663,8 +658,8 @@ export default function App() {
                       key={sent.id || idx}
                       onClick={() => setCurrentSentenceIndex(idx)}
                       className={`cursor-pointer transition-all leading-snug ${isCurrent
-                          ? 'text-lg font-bold text-slate-900'
-                          : 'text-sm font-semibold text-slate-500 hover:text-slate-700'
+                        ? 'text-base font-bold text-slate-900'
+                        : 'text-sm font-semibold text-slate-400 hover:text-slate-600'
                         }`}
                     >
                       "{renderInteractiveText(sent.text)}"
@@ -673,16 +668,19 @@ export default function App() {
                 })}
               </div>
 
-              {/* FULL CHAPTER NARRATION SUMMARY */}
+              {/* CHAPTER SUMMARY CARD */}
               {currentScene.narration && (
-                <div className="bg-pink-100 border border-pink-200 p-3 rounded-2xl flex flex-col gap-1.5 shadow-sm mt-1 mb-1">
+                <div
+                  className="rounded-2xl p-3 flex flex-col gap-1.5"
+                  style={{ background: 'linear-gradient(135deg, #fce7f3, #fdf2f8)', border: '1.5px solid #fbcfe8' }}
+                >
                   <div className="flex items-center gap-2">
-                    <div className="bg-pink-500 text-white p-1 rounded-lg">
-                      <BookOpen className="w-3 h-3" />
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: '#ec4899' }}>
+                      <BookOpen className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-xs font-bold text-rose-600">Chapter Summary</span>
+                    <span className="text-xs font-black text-rose-600">Chapter Summary</span>
                   </div>
-                  <p className="text-[11.5px] font-semibold text-slate-700 leading-relaxed">
+                  <p className="text-[12px] font-semibold text-slate-600 leading-relaxed">
                     {renderInteractiveText(currentScene.narration)}
                   </p>
                 </div>
@@ -707,8 +705,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* INTEGRATED PAGE TURN NAVIGATION CONTROLS */}
-              <div className="pt-1 mt-auto font-['Fredoka',sans-serif]">
+              {/* SCENE NAVIGATION CONTROLS */}
+              <div className="mt-auto pt-1 font-['Fredoka',sans-serif]">
                 <SceneControls
                   currentSceneId={currentSceneId}
                   totalScenes={currentStoryScenes.length}
@@ -726,11 +724,15 @@ export default function App() {
                       narrator.speakSentence(currentSentence);
                     }
                   }}
+                  onFinish={() => {
+                    unlockBadge('story-master');
+                    soundFX.playSuccessFanfare();
+                    handleGoHome();
+                  }}
                 />
-                {/* PAGE NUMBER AT BOTTOM OUTER CORNER */}
-                <div className="flex justify-between items-center text-[10px] font-black text-amber-900/80 mt-1.5 px-1 pb-1">
-                  <span>❖ STORY READING PAGE</span>
-                  <span>PAGE {currentSceneId * 2} OF {currentStoryScenes.length * 2}</span>
+                <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400 mt-2 px-1">
+                  <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Story Reading Page</span>
+                  <span>Page {currentSceneId} of {currentStoryScenes.length}</span>
                 </div>
               </div>
 

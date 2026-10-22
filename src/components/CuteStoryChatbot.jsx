@@ -157,13 +157,12 @@ export default function CuteStoryChatbot({ onSelectStory = () => {} }) {
     <div className="fixed bottom-5 right-5 z-50 select-none font-['Fredoka',sans-serif]">
 
       {/* FLOATING SIDE EMOJI TRIGGER BUTTON WITH TOOLTIP */}
-      <div className="relative flex items-center justify-end">
+      <div className="flex items-center gap-3 justify-end">
 
         {/* CUTE TOOLTIP SPEECH BUBBLE (WHEN CLOSED) */}
         {!isOpen && showTooltip && (
-          <div className="absolute right-18 bottom-1 bg-white text-slate-800 text-xs font-black px-3.5 py-2 rounded-2xl shadow-xl border-3 border-sky-400 animate-bounce whitespace-nowrap flex items-center gap-1.5 z-40">
+          <div className="bg-white text-slate-800 text-xs font-black px-3.5 py-2 rounded-2xl shadow-xl border-3 border-sky-400 animate-bounce whitespace-nowrap flex items-center gap-1.5 z-40">
             <span>Ask AI Story Buddy! 🧙‍♂️✨</span>
-            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-sky-400" />
           </div>
         )}
 
@@ -171,7 +170,7 @@ export default function CuteStoryChatbot({ onSelectStory = () => {} }) {
         <button
           onClick={toggleOpen}
           title="Open AI Story Buddy Chatbot 🧙‍♂️✨"
-          className="w-15 h-15 bg-gradient-to-tr from-sky-400 via-pink-400 to-amber-300 text-white rounded-full flex items-center justify-center text-3xl shadow-2xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all animate-bounce ring-4 ring-sky-300/80"
+          className="w-15 h-15 bg-gradient-to-tr from-sky-400 via-pink-400 to-amber-300 text-white rounded-full flex items-center justify-center text-3xl shadow-2xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all animate-bounce ring-4 ring-sky-300/80 shrink-0"
         >
           {isOpen ? '❌' : '🧙‍♂️'}
         </button>

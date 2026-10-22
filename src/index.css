@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Fredoka', 'Sniglet', 'Outfit', sans-serif;
-  background: radial-gradient(circle at top left, #fffbeb, #fef3c7, #e0f2fe);
+  background: linear-gradient(160deg, #e0f2fe 0%, #f0fdf4 40%, #fef9c3 70%, #fce7f3 100%);
   min-height: 100vh;
   color: #1e293b;
 }
@@ -703,14 +703,14 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fdf6e3;
+  background: #f0f9ff;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d97706;
+  background: #7dd3fc;
   border-radius: 4px;
-}
+}

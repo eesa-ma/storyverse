@@ -31,7 +31,7 @@ export default function SoundboardWidget({ onOpenSoundscapeMixer = () => {} }) {
   };
 
   return (
-    <div className="fixed bottom-6 right-20 z-40 font-['Fredoka',sans-serif] select-none">
+    <div className="fixed bottom-6 left-5 z-40 font-['Fredoka',sans-serif] select-none">
       {!isOpen ? (
         <button
           onClick={() => {

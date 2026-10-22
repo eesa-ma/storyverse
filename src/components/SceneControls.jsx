@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Volume2, Play, Pause } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Volume2, Play, Pause, Sparkles } from 'lucide-react';
 import { soundFX } from '../services/soundEffects';
 
 export default function SceneControls({
@@ -13,14 +13,14 @@ export default function SceneControls({
   onNextScene = () => {},
   onPrevScene = () => {},
   onReplayNarration = () => {},
-  onToggleAutoPlay = () => {}
+  onToggleAutoPlay = () => {},
+  onFinish = () => {}
 }) {
   const isFirstSentence = currentSentenceIndex === 0;
   const isLastSentence = currentSentenceIndex === totalSentences - 1;
   const isFirstScene = currentSceneId === 1;
   const isLastScene = currentSceneId === totalScenes;
 
-  // Unified Next Handler: steps sentence, or turns page if sentence is at end of scene
   const handleSmartNext = () => {
     soundFX.playPop();
     if (!isLastSentence) {
@@ -30,7 +30,6 @@ export default function SceneControls({
     }
   };
 
-  // Unified Prev Handler: steps previous sentence, or goes to previous page
   const handleSmartPrev = () => {
     soundFX.playPop();
     if (!isFirstSentence) {
@@ -40,61 +39,72 @@ export default function SceneControls({
     }
   };
 
-  return (
-    <div className="flex items-center justify-between gap-2.5 pt-2 select-none w-full font-['Fredoka',sans-serif]">
-      {/* 1. Previous Button */}
-      <button
-        onClick={handleSmartPrev}
-        disabled={isFirstScene && isFirstSentence}
-        className={`px-4 py-2.5 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 transition-all ${
-          isFirstScene && isFirstSentence
-            ? 'bg-orange-50 text-orange-300 border border-orange-200 cursor-not-allowed opacity-50'
-            : 'bg-orange-100 hover:bg-orange-200 text-orange-900 border border-orange-300 shadow-sm active:scale-95 cursor-pointer'
-        }`}
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Prev Line</span>
-      </button>
+  const isAtVeryStart = isFirstScene && isFirstSentence;
+  const isAtVeryEnd = isLastScene && isLastSentence;
 
-      {/* 2. Read Aloud Button */}
+  return (
+    <div className="flex items-center justify-between gap-2 pt-2 select-none w-full font-['Fredoka',sans-serif]">
+      
+      {/* Read Aloud */}
       <button
         onClick={() => {
           soundFX.playPop();
           onReplayNarration();
         }}
-        className="px-4 py-2.5 rounded-full bg-blue-100 hover:bg-blue-200 border border-blue-300 text-blue-900 font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+        className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full font-bold text-xs transition-all active:scale-95 cursor-pointer border-2"
+        style={{
+          background: 'linear-gradient(135deg, #e0f2fe, #bae6fd)',
+          borderColor: '#38bdf8',
+          color: '#0c4a6e',
+          boxShadow: '0 2px 8px rgba(56,189,248,0.2)'
+        }}
         title="Read Out Loud"
       >
-        <Volume2 className="w-4 h-4 text-blue-700" />
+        <Volume2 className="w-4 h-4 text-sky-600" />
         <span className="hidden sm:inline">Read Aloud</span>
       </button>
 
-      {/* 3. Storyteller Auto-Play Mode Button */}
+      {/* Auto-Play */}
       <button
         onClick={() => {
           soundFX.playPop();
           onToggleAutoPlay();
         }}
-        className={`px-4 py-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer ${
-          isAutoPlayActive
-            ? 'bg-amber-500 text-white border border-amber-600 ring-2 ring-amber-300 animate-pulse'
-            : 'bg-amber-400 hover:bg-amber-500 text-amber-950 border border-amber-500'
-        }`}
-        title="Toggle Hands-Free Storyteller Mode"
+        className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full font-black text-xs transition-all active:scale-95 cursor-pointer border-2 ${isAutoPlayActive ? 'animate-pulse' : ''}`}
+        style={isAutoPlayActive
+          ? { background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderColor: '#b45309', color: 'white', boxShadow: '0 3px 10px rgba(245,158,11,0.5)' }
+          : { background: 'linear-gradient(135deg, #fef9c3, #fde68a)', borderColor: '#f59e0b', color: '#78350f', boxShadow: '0 2px 8px rgba(245,158,11,0.25)' }
+        }
+        title="Toggle Auto-Play Story Mode"
       >
         {isAutoPlayActive ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
         <span>{isAutoPlayActive ? 'Playing...' : 'Auto-Play'}</span>
       </button>
 
-      {/* 4. Next / Turn Page Button */}
+      {/* Next Line / Turn Page */}
       <button
-        onClick={handleSmartNext}
-        className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 border border-blue-700 text-xs md:text-sm text-white font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95"
+        onClick={() => {
+          soundFX.playPop();
+          if (isAtVeryEnd) {
+            onFinish();
+          } else {
+            handleSmartNext();
+          }
+        }}
+        className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full font-black text-xs transition-all active:scale-95 cursor-pointer border-2 ${isAtVeryEnd ? 'animate-pulse' : ''}`}
+        style={isAtVeryEnd
+          ? { background: 'linear-gradient(135deg, #22c55e, #16a34a)', borderColor: '#15803d', color: 'white', boxShadow: '0 3px 10px rgba(34,197,94,0.5)' }
+          : { background: 'linear-gradient(135deg, #3b82f6, #2563eb)', borderColor: '#1d4ed8', color: 'white', boxShadow: '0 3px 10px rgba(59,130,246,0.4)' }
+        }
       >
-        <span>{isLastScene && isLastSentence ? 'Finish Story' : isLastSentence ? 'Turn Page' : 'Next Line'}</span>
+        <span className="flex items-center gap-1">
+          {isAtVeryEnd
+            ? <><span>Finish Story 🏠</span><Sparkles className="w-3.5 h-3.5 text-white" strokeWidth={2} /></>
+            : isLastSentence ? 'Turn Page' : 'Next Line'
+          }
+        </span>
         <ArrowRight className="w-4 h-4 text-white" />
       </button>
     </div>
   );
 }
-
