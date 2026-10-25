@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, Volume2, Mic, HelpCircle, Award, TrendingUp, Drama, BookMarked, Sparkles } from 'lucide-react';
+import { BookOpen, Volume2, Mic, MicOff, HelpCircle, Award, TrendingUp, Drama, BookMarked, Sparkles, ArrowLeft, ArrowRight, Play, Pause, X, Wrench } from 'lucide-react';
 import Navbar from './components/Navbar';
 import StorybookFrame from './components/StorybookFrame';
-import SceneControls from './components/SceneControls';
+import BottleObject from './components/BottleObject';
 import InteractivePanel from './components/InteractivePanel';
 import StoryChapterMap from './components/StoryChapterMap';
 import HomePage from './components/HomePage';
@@ -11,12 +11,10 @@ import WordMagicModal from './components/WordMagicModal';
 import ColoringEaselModal from './components/ColoringEaselModal';
 import TrophyChestModal, { BADGES_LIST } from './components/TrophyChestModal';
 import MemoryGameModal from './components/MemoryGameModal';
-import VoiceRecorderWidget from './components/VoiceRecorderWidget';
 import BedtimeCalmOverlay from './components/BedtimeCalmOverlay';
 import StoryMakerModal from './components/StoryMakerModal';
 import StoryQuizModal from './components/StoryQuizModal';
 import CareCertificateModal from './components/CareCertificateModal';
-import SoundboardWidget from './components/SoundboardWidget';
 import SoundscapeMixerModal from './components/SoundscapeMixerModal';
 import StickerStageModal from './components/StickerStageModal';
 import ReadingPassportModal from './components/ReadingPassportModal';
@@ -40,6 +38,16 @@ const ALL_STORY_SCENES = {
   'bear-lost-pencil': BEAR_STORY_SCENES
 };
 
+const ANIMATION_DETAILS = {
+  bounce: { label: 'Bouncing', icon: '⬆️', className: 'animate-gentle-bounce' },
+  sparkle: { label: 'Sparkling', icon: '✨', className: 'animate-sparkle' },
+  rocket: { label: 'Rocket launch', icon: '🚀', className: 'animate-rocket' },
+  wiggle: { label: 'Wiggling', icon: '〰️', className: 'animate-wiggle' },
+  pulse: { label: 'Pulsing', icon: '💓', className: 'animate-pulse-ring' },
+  float: { label: 'Floating', icon: '🎈', className: 'animate-float' },
+  glug: { label: 'Filling up', icon: '💧', className: 'animate-pulse' }
+};
+
 export default function App() {
   const [activeView, setActiveView] = useState('home'); // 'home' | 'reader'
   const [activeStoryId, setActiveStoryId] = useState('dolly-midnight-adventure');
@@ -56,7 +64,7 @@ export default function App() {
   // Educational Learning Feature States
   const [isBedtimeMode, setIsBedtimeMode] = useState(false);
   const [activeLanguage, setActiveLanguage] = useState('en');
-  const [unlockedBadges, setUnlockedBadges] = useState(['story-explorer']);
+  const [unlockedBadges, setUnlockedBadges] = useState([]);
   const [learnedWords, setLearnedWords] = useState([]);
 
   // Modals
@@ -71,7 +79,9 @@ export default function App() {
   const [showPuppetStageModal, setShowPuppetStageModal] = useState(false);
   const [showReadingPassportModal, setShowReadingPassportModal] = useState(false);
   const [showStoryArcModal, setShowStoryArcModal] = useState(false);
-  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [showToolsPanel, setShowToolsPanel] = useState(false);
+  const [objectPopup, setObjectPopup] = useState(null);
+  const [activeObjectId, setActiveObjectId] = useState(null);
 
   // FX & Animation States
   const [bottleState, setBottleState] = useState('happy');
@@ -81,12 +91,17 @@ export default function App() {
 
   const autoPlayTimeoutRef = useRef(null);
 
-  const currentScene = currentStoryScenes.find(s => s.id === currentSceneId) || currentStoryScenes[0];
-  const currentSentences = currentScene.sentences || [];
+  const currentScene = currentStoryScenes.find(s => s.id === currentSceneId) || currentStoryScenes[0] || STORY_SCENES[0];
+  const currentSentences = Array.isArray(currentScene?.sentences) ? currentScene.sentences : [];
 
   // Safely clamp sentence index within bounds
   const safeSentenceIndex = Math.min(currentSentenceIndex, Math.max(0, currentSentences.length - 1));
   const currentSentence = currentSentences[safeSentenceIndex] || currentSentences[0];
+  const currentAnimation = ANIMATION_DETAILS[currentSentence?.screenState?.animation] || {
+    label: 'Story moment',
+    icon: '📖',
+    className: ''
+  };
 
   // Unlock badge helper
   const unlockBadge = (badgeId) => {
@@ -121,11 +136,26 @@ export default function App() {
       setBottleState(currentSentence.screenState.bottleMood);
     }
 
-    // Trigger special sound FX for sentence
-    if (currentSentence.screenState?.overlayEmoji === '🔔' || currentSentence.text?.includes('🔔')) {
+    // Sound-effect lines use audio only; they must never be spoken by the narrator.
+    const soundText = currentSentence.text?.toLowerCase() || '';
+    const isSoundEffectSentence = currentSentence.speaker === 'SFX';
+    if (currentSentence.screenState?.overlayEmoji === '🔔' || soundText.includes('🔔')) {
       soundFX.playSchoolBell();
-    } else if (currentSentence.speaker === 'SFX') {
+    } else if (currentSentence.screenState?.overlayEmoji === '👣' || soundText.includes('footsteps')) {
+      soundFX.playFootsteps();
+    } else if (currentSentence.screenState?.overlayEmoji === '🚪' || soundText.includes('door')) {
+      soundFX.playDoorClack();
+    } else if (soundText.includes('whoosh') || soundText.includes('blast off')) {
+      soundFX.playRocketWhoosh();
+      setShowRocketLaunch(true);
+      setTimeout(() => setShowRocketLaunch(false), 600);
+      unlockBadge('space-cadet');
+    } else if (soundText.includes('clink') || soundText.includes('click') || soundText.includes('sparkle')) {
+      soundFX.playSparkle();
+    } else if (soundText.includes('pop') || soundText.includes('achoo')) {
       soundFX.playPop();
+    } else if (soundText.includes('grrr') || soundText.includes('rock moved')) {
+      soundFX.playBoing();
     } else if (currentSentence.screenState?.animation === 'rocket') {
       soundFX.playRocketWhoosh();
       setShowRocketLaunch(true);
@@ -138,7 +168,7 @@ export default function App() {
     }
 
     // Speak sentence with fallback safety callback for Auto-Play Mode
-    if (narratorEnabled) {
+    if (narratorEnabled && !isSoundEffectSentence) {
       narrator.speakSentence(currentSentence, () => {
         if (isAutoPlayActive) {
           autoPlayTimeoutRef.current = setTimeout(() => {
@@ -147,11 +177,18 @@ export default function App() {
         }
       });
     } else if (isAutoPlayActive) {
-      const timerMs = Math.max(2500, currentSentence.text.length * 80);
+      const timerMs = Math.max(2500, (currentSentence.text || '').length * 80);
       autoPlayTimeoutRef.current = setTimeout(() => {
         handleNextSentenceAuto();
       }, timerMs);
     }
+
+    return () => {
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+        autoPlayTimeoutRef.current = null;
+      }
+    };
   }, [activeView, currentSceneId, safeSentenceIndex, narratorEnabled, isAutoPlayActive]);
 
   const handleNextSentenceAuto = () => {
@@ -269,6 +306,45 @@ export default function App() {
 
   // Direct click interaction on stage objects
   const handleCanvasObjectClick = (objectType) => {
+    const tappedObject = currentScene.objects?.find(object => object.id === objectType);
+    const bottleEmotion = currentScene.id === 2 || currentScene.id === 3
+      ? { emotion: 'Anxious', emotionIcon: '😰' }
+      : null;
+    const specialObjectMessages = {
+      tap: { name: 'Water Tap', icon: '🚰', emotion: 'Refreshing', emotionIcon: '💦', message: 'Turn on the tap to fill Buddy with fresh water!' },
+      cap: { name: 'Bottle Cap', icon: '🔵', visualType: 'cap', emotion: 'Careful', emotionIcon: '🤗', message: 'Close the bottle cap tightly so Buddy is ready for the journey!' },
+      clock: { name: 'Classroom Clock', icon: '⏰', emotion: 'Calm', emotionIcon: '😌', message: 'Tick-tock! The quiet classroom is waiting.' },
+      window: { name: 'Sunny Window', icon: '☀️', emotion: 'Cheerful', emotionIcon: '😊', message: 'Warm sunlight shines into the classroom.' },
+      aarav: { name: 'Aarav', icon: '👦', emotion: 'Friendly', emotionIcon: '👋', message: 'Hi there! Ready to turn the page?' },
+      unpacked_books: { name: 'Books', icon: '📚', emotion: 'Ready', emotionIcon: '📖', message: 'The books pop out of the schoolbag, ready for reading!' },
+      unpacked_pencil: { name: 'Pencil', icon: '✏️', emotion: 'Creative', emotionIcon: '🎨', message: 'The pencil pops out, ready to write!' },
+      unpacked_lunchbox: { name: 'Lunchbox', icon: '🍱', emotion: 'Prepared', emotionIcon: '😊', message: 'The lunchbox is packed and ready for lunch!' },
+      unpacked_apple: { name: 'Apple', icon: '🍎', emotion: 'Healthy', emotionIcon: '💚', message: 'The apple pops out as a healthy snack!' }
+    };
+    const popupObject = tappedObject
+      ? {
+          name: tappedObject.name,
+          icon: tappedObject.icon,
+          emotion: tappedObject.emotion || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotion : tappedObject.soundEffect === 'rocket' ? 'Excited' : tappedObject.soundEffect === 'sparkle' ? 'Joyful' : 'Curious'),
+          emotionIcon: tappedObject.emotionIcon || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotionIcon : tappedObject.soundEffect === 'rocket' ? '🤩' : tappedObject.soundEffect === 'sparkle' ? '✨' : '🙂'),
+          message: tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint
+        }
+      : specialObjectMessages[objectType] || {
+          name: objectType === 'cap' ? 'Bottle Cap' : 'Story Object',
+          icon: objectType === 'cap' ? '🔵' : '✨',
+          emotion: 'Curious',
+          emotionIcon: '🙂',
+          message: objectType === 'cap'
+            ? 'This is Buddy’s bottle cap. Tap it to seal the bottle!'
+            : 'You found a special story object!'
+        };
+
+    setObjectPopup(popupObject);
+    setActiveObjectId(objectType);
+    window.setTimeout(() => {
+      setActiveObjectId(currentId => currentId === objectType ? null : currentId);
+    }, 2200);
+
     if (objectType === 'bottle') {
       soundFX.playSparkle();
       setShowSparkle(true);
@@ -305,6 +381,17 @@ export default function App() {
         setShowSparkle(true);
         setTimeout(() => setShowSparkle(false), 600);
       }
+    } else {
+      if (tappedObject) {
+        if (tappedObject.soundEffect === 'sparkle' || tappedObject.soundEffect === 'rocket') {
+          soundFX.playSparkle();
+        } else {
+          soundFX.playPop();
+        }
+        if (narratorEnabled) {
+          narrator.speak(tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint || `You found the ${tappedObject.name}!`, 'NARRATOR');
+        }
+      }
     }
   };
 
@@ -334,7 +421,12 @@ export default function App() {
     setActiveStoryId(storyId);
     setCurrentSceneId(1);
     setCurrentSentenceIndex(0);
+    setWaterStep(0);
+    setShowSparkle(false);
+    setShowRocketLaunch(false);
     setIsAutoPlayActive(false);
+    setObjectPopup(null);
+    setActiveObjectId(null);
     setActiveView('reader');
     soundFX.playSparkle();
     unlockBadge('story-explorer');
@@ -400,7 +492,6 @@ export default function App() {
         <CuteStoryChatbot onSelectStory={handleSelectStory} />
 
         {/* Global Sound Lab Synthesizer Foley Widget */}
-        <SoundboardWidget onOpenSoundscapeMixer={() => setShowSoundscapeModal(true)} />
 
         {/* Floating Educational Feature Modals */}
         {activeWordMagic && (
@@ -503,6 +594,9 @@ export default function App() {
       {/* Bedtime Atmosphere Overlay */}
       <BedtimeCalmOverlay isActive={isBedtimeMode} />
 
+      {/* Quiet story-world backdrop behind the open book */}
+      {!isBedtimeMode && <div className="reader-world-backdrop" aria-hidden="true" />}
+
       <Navbar
         currentSceneId={currentSceneId}
         totalScenes={currentStoryScenes.length}
@@ -527,10 +621,54 @@ export default function App() {
       />
 
       <main className="w-full max-w-7xl mx-auto flex-1 p-3 md:p-5 flex flex-col gap-4 items-stretch z-10">
+        {objectPopup && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+            onClick={() => {
+              setObjectPopup(null);
+              setActiveObjectId(null);
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${objectPopup.name} message`}
+          >
+              <div
+              className="w-full max-w-sm rounded-3xl border-4 border-amber-300 bg-[#fffdf8] p-6 text-center shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mb-2 flex h-16 items-center justify-center text-5xl" aria-hidden="true">
+                {objectPopup.visualType === 'cap' ? (
+                  <span className="relative inline-block h-8 w-16 rounded-md border-4 border-blue-950 bg-blue-700 shadow-md">
+                    <span className="absolute inset-x-1 top-1 border-t-2 border-blue-300" />
+                    <span className="absolute inset-x-1 bottom-1 border-b-2 border-blue-900" />
+                  </span>
+                ) : objectPopup.name?.toLowerCase().includes('bottle') ? (
+                  <BottleObject size="medium" className="pointer-events-none" />
+                ) : objectPopup.icon}
+              </div>
+              <h2 className="text-xl font-black text-amber-950">{objectPopup.name}</h2>
+              <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-black text-amber-900">
+                <span aria-hidden="true">{objectPopup.emotionIcon}</span>
+                <span>Feeling {objectPopup.emotion}</span>
+              </div>
+              <p className="mt-3 text-base font-bold leading-relaxed text-slate-700">{objectPopup.message}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setObjectPopup(null);
+                  setActiveObjectId(null);
+                }}
+                className="mt-5 rounded-full bg-amber-500 px-6 py-2 font-black text-white shadow-md transition hover:bg-amber-600 active:scale-95"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* MAIN STORYBOOK CARD */}
         <div
-          className={`w-full rounded-3xl relative flex flex-col overflow-hidden ${isBedtimeMode ? 'border-2 border-indigo-500' : ''}`}
+          className={`reader-spread w-full rounded-3xl relative flex flex-col overflow-hidden ${isBedtimeMode ? 'border-2 border-indigo-500' : ''}`}
           style={!isBedtimeMode ? {
             background: 'white',
             border: '2.5px solid #bae6fd',
@@ -539,7 +677,7 @@ export default function App() {
         >
 
           {/* ALWAYS SIDE-BY-SIDE 2-PAGE OPEN STORYBOOK SPREAD */}
-          <div className="grid grid-cols-12 gap-0 items-stretch w-full flex-1 min-h-0 relative rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-12 gap-0 items-stretch w-full h-full flex-1 min-h-0 relative rounded-3xl overflow-hidden">
 
             {/* LEFT PAGE: PICTURE STORYBOOK ILLUSTRATION */}
             <div className="col-span-6 h-full min-h-0 flex flex-col justify-center relative overflow-hidden">
@@ -551,6 +689,7 @@ export default function App() {
                 showSparkle={showSparkle}
                 showRocketLaunch={showRocketLaunch}
                 waterStationStep={waterStep}
+                activeObjectId={activeObjectId}
                 onTapObject={handleCanvasObjectClick}
               />
             </div>
@@ -558,185 +697,257 @@ export default function App() {
             {/* REALISTIC SUNKEN BOOK SPINE / GUTTER */}
             <div className="block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 z-30 pointer-events-none book-spine-gutter shadow-2xl" />
 
-            {/* RIGHT PAGE: REDESIGNED CLEAN READING PANEL */}
+            {/* RIGHT PAGE: IMMERSIVE STORYBOOK PAGE */}
             <div
-              className="col-span-6 flex flex-col gap-3 p-4 md:p-5 relative select-none overflow-y-auto"
-              style={{ background: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 100%)' }}
+              className="col-span-6 h-full min-h-0 flex flex-col relative select-none overflow-hidden"
+              style={{ background: 'linear-gradient(180deg, #fffef7 0%, #fdf9ee 60%, #faf5e4 100%)' }}
             >
-
-              {/* TOP CHARACTER + TITLE HEADER */}
-              <div>
-                {/* Speaker badge + mini action pills */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5"
-                      style={{ background: 'linear-gradient(135deg, #fef9c3, #fde68a)', border: '1.5px solid #f59e0b', color: '#78350f' }}
-                    >
-                      <Mic className="w-3 h-3 shrink-0" strokeWidth={2.5} />
-                      {currentSentence?.speaker === 'LILY' ? 'Lily Doll' : currentSentence?.speaker === 'GIRL' ? 'Little Girl' : currentSentence?.speaker === 'RABBIT' ? 'Teacup Rabbit' : currentSentence?.speaker === 'MILO' ? 'Milo' : currentSentence?.speaker === 'TOBY' ? 'Toby' : currentSentence?.speaker === 'ROCKY' ? 'Rocky' : currentSentence?.speaker === 'COMET' ? 'Starry' : currentSentence?.speaker === 'BENNY' ? 'Benny Bear' : currentSentence?.speaker === 'BOTTLE' ? 'Buddy' : currentSentence?.speaker === 'AARAV' ? 'Aarav' : 'Narrator'}
-                    </span>
-                    <span className="text-[11px] font-bold text-slate-400">
-                      Line {safeSentenceIndex + 1}/{currentSentences.length}
-                    </span>
-                  </div>
-
-                  {/* Mini action toolbar */}
-                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                    <button
-                      onClick={() => { soundFX.playPop(); setShowQuizModal(true); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={{ background: '#f3e8ff', borderColor: '#d8b4fe', color: '#7c3aed' }}
-                      title="Story Quiz"
-                    ><HelpCircle className="w-3 h-3" strokeWidth={2.5} /> Quiz</button>
-                    <button
-                      onClick={() => { soundFX.playSparkle(); setShowCareCertificateModal(true); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={{ background: '#fef9c3', borderColor: '#fde68a', color: '#92400e' }}
-                      title="Award Certificate"
-                    ><Award className="w-3 h-3" strokeWidth={2.5} /> Award</button>
-                    <button
-                      onClick={() => { soundFX.playPop(); setShowStoryArcModal(true); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={{ background: '#e0e7ff', borderColor: '#c7d2fe', color: '#3730a3' }}
-                      title="Narrative Arc"
-                    ><TrendingUp className="w-3 h-3" strokeWidth={2.5} /> Arc</button>
-                    <button
-                      onClick={() => { soundFX.playPop(); setShowVoiceRecorder(prev => !prev); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={showVoiceRecorder
-                        ? { background: '#ef4444', borderColor: '#dc2626', color: 'white' }
-                        : { background: '#ffe4e6', borderColor: '#fca5a5', color: '#9f1239' }
-                      }
-                      title="Voice Recorder"
-                    ><Mic className="w-3 h-3" strokeWidth={2.5} /> Record</button>
-                    <button
-                      onClick={() => { soundFX.playPop(); setShowPuppetStageModal(true); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={{ background: '#fce7f3', borderColor: '#f9a8d4', color: '#9d174d' }}
-                      title="Puppet Theater"
-                    ><Drama className="w-3 h-3" strokeWidth={2.5} /> Puppet</button>
-                    <button
-                      onClick={() => { soundFX.playSparkle(); setShowReadingPassportModal(true); }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer border"
-                      style={{ background: '#ccfbf1', borderColor: '#99f6e4', color: '#134e4a' }}
-                      title="Reading Passport"
-                    ><BookMarked className="w-3 h-3" strokeWidth={2.5} /> Passport</button>
-                    <button
-                      className="w-7 h-7 rounded-full flex items-center justify-center border transition-all active:scale-95 cursor-pointer"
-                      style={{ background: '#e0f2fe', borderColor: '#7dd3fc', color: '#0284c7' }}
-                      onClick={() => { if (currentSentence && narratorEnabled) narrator.speakSentence(currentSentence); }}
-                      title="Read this line aloud"
-                    >
-                      <Volume2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Big Chapter Title */}
-                <h2 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight mb-0.5 flex items-center gap-2">
-                  {currentScene.title}
-                  <Sparkles className="w-5 h-5 text-amber-400 shrink-0" strokeWidth={2} />
-                </h2>
-                {/* Current sentence as subtitle */}
-                {currentSentence && (
-                  <p className="text-sm font-semibold text-slate-500 leading-snug">
-                    {currentSentence.text.length > 80 ? currentSentence.text.slice(0, 80) + '…' : currentSentence.text}
-                  </p>
-                )}
-              </div>
-
-              {/* STORY TEXT SENTENCES */}
-              <div
-                className="rounded-2xl p-3 flex flex-col gap-2 font-['Fredoka',sans-serif]"
-                style={{ background: 'linear-gradient(135deg, #fafafa, #f8fafc)', border: '1.5px solid #e2e8f0' }}
-              >
-                {currentSentences.map((sent, idx) => {
-                  const isCurrent = idx === safeSentenceIndex;
-                  return (
-                    <p
-                      key={sent.id || idx}
-                      onClick={() => setCurrentSentenceIndex(idx)}
-                      className={`cursor-pointer transition-all leading-snug ${isCurrent
-                        ? 'text-base font-bold text-slate-900'
-                        : 'text-sm font-semibold text-slate-400 hover:text-slate-600'
-                        }`}
-                    >
-                      "{renderInteractiveText(sent.text)}"
-                    </p>
-                  );
-                })}
-              </div>
-
-              {/* CHAPTER SUMMARY CARD */}
-              {currentScene.narration && (
-                <div
-                  className="rounded-2xl p-3 flex flex-col gap-1.5"
-                  style={{ background: 'linear-gradient(135deg, #fce7f3, #fdf2f8)', border: '1.5px solid #fbcfe8' }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: '#ec4899' }}>
-                      <BookOpen className="w-3.5 h-3.5 text-white" />
+              {/* CHAPTER HEADER — thin elegant stripe */}
+              <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b shrink-0" style={{ borderColor: '#ead7b4' }}>
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="text-[11px] font-black uppercase tracking-wide px-3 py-1 rounded-full shrink-0"
+                    style={{ background: '#ffe38a', color: '#142b55', border: '1px solid #f3c94c' }}
+                  >
+                    Ch. {currentSceneId}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg leading-none" aria-hidden="true">{activeStoryObj.coverEmoji}</span>
+                      <span className="text-base font-black text-[#102b57] truncate max-w-[280px]">
+                        {currentScene.title}
+                      </span>
                     </div>
-                    <span className="text-xs font-black text-rose-600">Chapter Summary</span>
+                    <span className="block truncate text-[10px] font-bold uppercase tracking-wider text-[#8a7890]">
+                      {activeStoryObj.category} · {activeStoryObj.badge}
+                    </span>
                   </div>
-                  <p className="text-[12px] font-semibold text-slate-600 leading-relaxed">
-                    {renderInteractiveText(currentScene.narration)}
-                  </p>
                 </div>
-              )}
-
-              {/* SELECTIVE INTERACTIVE REFLECTION PANEL FOR CURRENT SCENE */}
-              <InteractivePanel
-                scene={currentScene}
-                selectedQuizAnswer={selectedQuizAnswers[currentSceneId]}
-                waterStep={waterStep}
-                checklistState={checklistState}
-                onQuizSelect={handleQuizSelect}
-                onPlayFootstepAudio={() => soundFX.playFootsteps()}
-                onObjectTap={handleCanvasObjectClick}
-                onChecklistToggle={handleChecklistToggle}
-              />
-
-              {/* INTERACTIVE VOICE RECORD & PLAYBACK WIDGET */}
-              {showVoiceRecorder && (
-                <div className="mb-2 animate-fadeIn">
-                  <VoiceRecorderWidget currentSentenceText={currentSentence?.text} />
-                </div>
-              )}
-
-              {/* SCENE NAVIGATION CONTROLS */}
-              <div className="mt-auto pt-1 font-['Fredoka',sans-serif]">
-                <SceneControls
-                  currentSceneId={currentSceneId}
-                  totalScenes={currentStoryScenes.length}
-                  currentSentence={currentSentence}
-                  currentSentenceIndex={safeSentenceIndex}
-                  totalSentences={currentSentences.length}
-                  isAutoPlayActive={isAutoPlayActive}
-                  onNextSentence={handleNextSentence}
-                  onPrevSentence={handlePrevSentence}
-                  onNextScene={handleNextScene}
-                  onPrevScene={handlePrevScene}
-                  onToggleAutoPlay={handleToggleAutoPlay}
-                  onReplayNarration={() => {
-                    if (currentSentence && narratorEnabled) {
-                      narrator.speakSentence(currentSentence);
-                    }
-                  }}
-                  onFinish={() => {
-                    unlockBadge('story-master');
-                    soundFX.playSuccessFanfare();
-                    handleGoHome();
-                  }}
-                />
-                <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400 mt-2 px-1">
-                  <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Story Reading Page</span>
-                  <span>Page {currentSceneId} of {currentStoryScenes.length}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      soundFX.playPageFlip();
+                      if (safeSentenceIndex > 0) handlePrevSentence();
+                      else if (currentSceneId > 1) handlePrevScene();
+                    }}
+                    disabled={currentSceneId === 1 && safeSentenceIndex === 0}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center text-slate-500 hover:bg-white disabled:opacity-35 disabled:cursor-not-allowed transition-all"
+                    style={{ borderColor: '#e6dcc8', background: '#fffdf8' }}
+                    aria-label="Previous page"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-[11px] font-bold text-[#7b8ca6] min-w-[35px] text-center">
+                    {safeSentenceIndex + 1} / {currentSentences.length}
+                  </span>
+                  <button
+                    onClick={() => {
+                      soundFX.playPageFlip();
+                      if (safeSentenceIndex < currentSentences.length - 1) handleNextSentence();
+                      else if (currentSceneId < currentStoryScenes.length) handleNextScene();
+                    }}
+                    disabled={currentSceneId === currentStoryScenes.length && safeSentenceIndex === currentSentences.length - 1}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center text-[#102b57] hover:bg-amber-100 disabled:opacity-35 disabled:cursor-not-allowed transition-all"
+                    style={{ borderColor: '#e6c86a', background: '#ffe38a' }}
+                    aria-label="Next page"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowToolsPanel(true)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all cursor-pointer hover:scale-110"
+                    style={{ background: '#e5e9ff', border: '1px solid #b9c4f5' }}
+                    title="Open Story Tools"
+                  >
+                    🛠️
+                  </button>
                 </div>
               </div>
 
+              {/* READING AREA */}
+              <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4 min-h-0">
+
+                {/* Speaker label */}
+                <div className="flex items-center gap-2">
+                  <span className="text-lg leading-none flex items-center">
+                    {currentSentence?.speaker === 'BOTTLE' ? <BottleObject size="small" className="pointer-events-none" />
+                      : currentSentence?.speaker === 'AARAV' ? '👦'
+                      : currentSentence?.speaker === 'LILY' ? '🎀'
+                      : currentSentence?.speaker === 'GIRL' ? '👧'
+                      : currentSentence?.speaker === 'MILO' ? '🦊'
+                      : currentSentence?.speaker === 'TOBY' ? '🐰'
+                      : currentSentence?.speaker === 'ROCKY' ? '🚀'
+                      : currentSentence?.speaker === 'BENNY' ? '🐻'
+                      : '📖'}
+                  </span>
+                  <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#7185a4]">
+                    {currentSentence?.speaker === 'LILY' ? 'Lily Doll'
+                      : currentSentence?.speaker === 'GIRL' ? 'Little Girl'
+                      : currentSentence?.speaker === 'RABBIT' ? 'Teacup Rabbit'
+                      : currentSentence?.speaker === 'MILO' ? 'Milo'
+                      : currentSentence?.speaker === 'TOBY' ? 'Toby'
+                      : currentSentence?.speaker === 'ROCKY' ? 'Rocky'
+                      : currentSentence?.speaker === 'COMET' ? 'Starry'
+                      : currentSentence?.speaker === 'BENNY' ? 'Benny Bear'
+                      : currentSentence?.speaker === 'BOTTLE' ? 'Buddy'
+                      : currentSentence?.speaker === 'AARAV' ? 'Aarav'
+                      : 'Narrator'}
+                  </span>
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, #e6dcc8, transparent)' }} />
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800 shadow-sm">
+                    <span className={currentAnimation.className} aria-hidden="true">{currentAnimation.icon}</span>
+                    Animation: {currentAnimation.label}
+                  </span>
+                </div>
+
+                {/* STORY SENTENCES — big, prominent, immersive */}
+                <div className="flex flex-col gap-3 font-['Fredoka',sans-serif] max-w-[620px]">
+                  {currentSentences.map((sent, idx) => {
+                    const isCurrent = idx === safeSentenceIndex;
+                    const isPast = idx < safeSentenceIndex;
+                    const sentenceAnimation = ANIMATION_DETAILS[sent.screenState?.animation] || {
+                      label: 'Story moment',
+                      icon: '📖',
+                      className: ''
+                    };
+                    return (
+                      <div
+                        key={sent.id || idx}
+                        onClick={() => setCurrentSentenceIndex(idx)}
+                        className={`group flex items-start gap-2 rounded-2xl border px-3 py-2 cursor-pointer transition-all duration-300 ${
+                          isCurrent
+                            ? 'border-amber-200 bg-amber-50/70 text-xl md:text-[23px] font-black text-[#102b57] shadow-sm'
+                            : isPast
+                            ? 'border-transparent text-sm font-medium text-slate-300 hover:border-slate-200 hover:text-slate-500'
+                            : 'border-transparent text-sm font-medium text-slate-400 hover:border-slate-200 hover:text-slate-600'
+                        }`}
+                      >
+                        <span className={`mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm ${
+                          isCurrent ? 'bg-white shadow-sm' : 'bg-slate-100/70 opacity-60'
+                        } ${isCurrent ? sentenceAnimation.className : ''}`} title={`Animation: ${sentenceAnimation.label}`}>
+                          {sentenceAnimation.icon}
+                        </span>
+                        <span className="leading-relaxed">
+                          {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none mr-0.5">“</span>}
+                          {isCurrent ? renderInteractiveText(sent.text) : sent.text}
+                          {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none ml-0.5">”</span>}
+                          <span className={`ml-2 align-middle text-[10px] font-black uppercase tracking-wide ${
+                            isCurrent ? 'text-amber-700' : 'text-slate-400'
+                          }`}>
+                            {sentenceAnimation.label}
+                          </span>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* INTERACTIVE REFLECTION PANEL */}
+                <InteractivePanel
+                  scene={currentScene}
+                  selectedQuizAnswer={selectedQuizAnswers[currentSceneId]}
+                  waterStep={waterStep}
+                  checklistState={checklistState}
+                  onQuizSelect={handleQuizSelect}
+                  onPlayFootstepAudio={() => soundFX.playFootsteps()}
+                  onObjectTap={handleCanvasObjectClick}
+                  onChecklistToggle={handleChecklistToggle}
+                />
+
+                {/* VOICE RECORDER */}
+              </div>
+
+              {/* PAGE-TURN NAVIGATION */}
+              <div
+                className="shrink-0 px-5 py-3 flex items-center justify-between gap-2 border-t"
+                style={{ background: 'rgba(255,250,239,0.92)', borderColor: '#ead7b4' }}
+              >
+                {/* ← Prev */}
+                <button
+                  onClick={() => {
+                    soundFX.playPageFlip();
+                    if (safeSentenceIndex > 0) handlePrevSentence();
+                    else if (currentSceneId > 1) handlePrevScene();
+                  }}
+                  disabled={currentSceneId === 1 && safeSentenceIndex === 0}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-sm text-slate-500 hover:text-slate-900 hover:bg-white border transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  style={{ borderColor: '#eee3cf', background: '#fffdf8' }}
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline text-xs">{safeSentenceIndex === 0 ? 'Prev' : 'Back'}</span>
+                </button>
+
+                {/* Center controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => { soundFX.playPop(); setNarratorEnabled(p => !p); }}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer hover:scale-105"
+                    style={{ background: '#fff', borderColor: '#e8d5a0' }}
+                    title={narratorEnabled ? 'Narrator On' : 'Narrator Off'}
+                  >
+                    {narratorEnabled
+                      ? <Mic className="w-3.5 h-3.5 text-amber-500" strokeWidth={2.5} />
+                      : <MicOff className="w-3.5 h-3.5 text-slate-400" strokeWidth={2.5} />}
+                  </button>
+
+                  <button
+                    onClick={() => { soundFX.playPop(); handleToggleAutoPlay(); }}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-black text-xs border transition-all cursor-pointer ${
+                      isAutoPlayActive ? 'animate-pulse' : ''
+                    }`}
+                    style={isAutoPlayActive
+                      ? { background: '#6366f1', borderColor: '#4f46e5', color: 'white' }
+                      : { background: '#fff', borderColor: '#e8d5a0', color: '#78350f' }
+                    }
+                  >
+                    {isAutoPlayActive
+                      ? <><Pause className="w-3 h-3 fill-current" /> Playing</>
+                      : <><Play className="w-3 h-3 fill-current" /> Auto</>}
+                  </button>
+
+                  <span className="text-[11px] font-bold text-slate-400">
+                    {currentSceneId} / {currentStoryScenes.length}
+                  </span>
+                </div>
+
+                {/* Next → / Finish */}
+                {(() => {
+                  const isAtVeryEnd = currentSceneId === currentStoryScenes.length && safeSentenceIndex === currentSentences.length - 1;
+                  return (
+                    <button
+                      onClick={() => {
+                        soundFX.playPop();
+                        if (isAtVeryEnd) {
+                          unlockBadge('story-master');
+                          soundFX.playSuccessFanfare();
+                          handleGoHome();
+                        } else if (safeSentenceIndex < currentSentences.length - 1) {
+                          handleNextSentence();
+                        } else {
+                          soundFX.playPageFlip();
+                          handleNextScene();
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full font-black text-sm text-white transition-all cursor-pointer ${
+                        isAtVeryEnd ? 'animate-pulse' : ''
+                      }`}
+                      style={{
+                        background: isAtVeryEnd
+                          ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                          : 'linear-gradient(135deg, #ffb11b, #f28b00)',
+                        boxShadow: isAtVeryEnd ? '0 3px 10px rgba(34,197,94,0.4)' : '0 3px 10px rgba(245,158,11,0.35)'
+                      }}
+                    >
+                      <span className="hidden sm:inline text-xs">
+                        {isAtVeryEnd ? 'Finish 🏠' : safeSentenceIndex < currentSentences.length - 1 ? 'Next Line' : 'Turn Page'}
+                      </span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  );
+                })()}
+              </div>
             </div>
+
 
           </div>
 
@@ -747,6 +958,9 @@ export default function App() {
           <StoryChapterMap
             currentScene={currentScene}
             scenes={currentStoryScenes}
+            storyId={activeStoryId}
+            storyTitle={activeStoryObj.title}
+            storyEmoji={activeStoryObj.coverEmoji}
             currentSentenceIndex={safeSentenceIndex}
             onSelectScene={(sceneId) => {
               narrator.cancel();
@@ -759,6 +973,52 @@ export default function App() {
 
         {/* CUTE STORYBUDDY CHATBOT FOR KIDS */}
         <CuteStoryChatbot onSelectStory={handleSelectStory} />
+
+        {/* FLOATING TOOLS PANEL */}
+        {showToolsPanel && (
+          <div
+            className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4"
+            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(6px)' }}
+            onClick={() => setShowToolsPanel(false)}
+          >
+            <div
+              className="bg-white rounded-3xl shadow-2xl p-5 w-full max-w-sm border-2 border-amber-200 font-['Fredoka',sans-serif]"
+              style={{ animation: 'scaleUp 0.2s ease-out' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
+                  <span className="text-xl">🛠️</span> Story Tools
+                </h3>
+                <button
+                  onClick={() => setShowToolsPanel(false)}
+                  className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="grid grid-cols-4 gap-2.5">
+                {[
+                  { icon: '🏆', label: 'Badges', onClick: () => { setShowBadgesModal(true); setShowToolsPanel(false); } },
+                  { icon: '🎨', label: 'Color', onClick: () => { setShowEaselModal(true); setShowToolsPanel(false); } },
+                  { icon: '🃏', label: 'Game', onClick: () => { setShowMemoryGameModal(true); setShowToolsPanel(false); } },
+                  { icon: '✨', label: 'Maker', onClick: () => { setShowStoryMakerModal(true); setShowToolsPanel(false); } },
+                  { icon: '❓', label: 'Quiz', onClick: () => { setShowQuizModal(true); setShowToolsPanel(false); } },
+                  { icon: '📓', label: 'Passport', onClick: () => { setShowReadingPassportModal(true); setShowToolsPanel(false); } },
+                ].map((tool) => (
+                  <button
+                    key={tool.label}
+                    onClick={() => { soundFX.playPop(); tool.onClick(); }}
+                    className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all cursor-pointer active:scale-95"
+                  >
+                    <span className="text-2xl">{tool.icon}</span>
+                    <span className="text-[10px] font-bold text-slate-700 text-center leading-tight">{tool.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Floating Educational Feature Modals */}
         {activeWordMagic && (
@@ -845,7 +1105,6 @@ export default function App() {
         )}
 
         {/* Global Sound Lab Synthesizer Foley Widget */}
-        <SoundboardWidget onOpenSoundscapeMixer={() => setShowSoundscapeModal(true)} />
       </main>
     </div>
   );

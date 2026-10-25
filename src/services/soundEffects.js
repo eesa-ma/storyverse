@@ -45,6 +45,28 @@ class SoundEffectsService {
     osc.stop(now + 0.09);
   }
 
+  playPageFlip() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const oscillator = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(420, now);
+    oscillator.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+    oscillator.connect(gain);
+    gain.connect(this.ctx.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.13);
+  }
+
   playSparkle() {
     if (this.isMuted) return;
     this.initContext();
@@ -594,4 +616,3 @@ class SoundEffectsService {
 }
 
 export const soundFX = new SoundEffectsService();
-

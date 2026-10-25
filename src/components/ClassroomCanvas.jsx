@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Heart, Volume2, Search, Footprints, Clock, Rocket, Zap } from 'lucide-react';
 import ChalkboardCanvas from './ChalkboardCanvas';
+import BottleObject from './BottleObject';
 
 export default function ClassroomCanvas({
   scene,
@@ -67,8 +68,7 @@ export default function ClassroomCanvas({
       {/* Dynamic Classroom Image with Camera Zoom & Atmospheric Filters */}
       {scene.background !== 'water-station' && (
         <div
-          onClick={() => onTapObject('bottle')}
-          className={`absolute inset-0 cursor-pointer transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
+          className={`absolute inset-0 transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
         >
           <img
             src="/aarav_empty_desk_classroom_bg.jpg"
@@ -102,7 +102,7 @@ export default function ClassroomCanvas({
               Active Scene Element
             </span>
             <span className="text-xs md:text-sm font-extrabold text-white">
-              {currentSentence.speaker === 'BOTTLE' ? '💧 Bottle Speaking' : currentSentence.speaker === 'AARAV' ? '👦 Aarav Speaking' : currentSentence.speaker === 'SFX' ? '🔊 Sound Effect' : '🗣️ Narration'}
+              {currentSentence.speaker === 'BOTTLE' ? <><BottleObject size="small" className="pointer-events-none" /> Bottle Speaking</> : currentSentence.speaker === 'AARAV' ? '👦 Aarav Speaking' : currentSentence.speaker === 'SFX' ? '🔊 Sound Effect' : '🗣️ Narration'}
             </span>
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function ClassroomCanvas({
             } flex flex-col items-center bg-white/95 p-4 md:p-6 rounded-3xl border-4 border-sky-400 shadow-xl`}
           >
             <div className="relative">
-              <span className="text-6xl md:text-7xl">💧</span>
+              <BottleObject size="medium" className="pointer-events-none" />
               {waterStationStep >= 2 && (
                 <span className="absolute top-0 right-0 text-2xl animate-bounce">✨</span>
               )}
@@ -243,7 +243,10 @@ export default function ClassroomCanvas({
               waterStationStep === 2 ? 'scale-110 ring-4 ring-sky-400 animate-pulse' : ''
             } flex flex-col items-center bg-white/95 p-4 md:p-6 rounded-3xl border-4 border-sky-400 shadow-xl`}
           >
-            <span className="text-6xl md:text-7xl">🧢</span>
+            <span className="relative inline-block h-12 w-24 rounded-lg border-4 border-blue-950 bg-blue-700 shadow-md">
+              <span className="absolute inset-x-2 top-2 border-t-4 border-blue-300" />
+              <span className="absolute inset-x-2 bottom-2 border-b-4 border-blue-900" />
+            </span>
             <span className="text-xs font-black text-sky-900 mt-2">3. Close Cap</span>
           </div>
         </div>

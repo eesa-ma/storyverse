@@ -314,15 +314,6 @@ export default function HomePage({
               </button>
               <button
                 onClick={() => {
-                  soundFX.playPop();
-                  onOpenPuppetTheater();
-                }}
-                className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-xs md:text-sm shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
-              >
-                <span>🎭 Puppet Theater</span>
-              </button>
-              <button
-                onClick={() => {
                   soundFX.playSparkle();
                   onOpenPassport();
                 }}
@@ -453,23 +444,6 @@ export default function HomePage({
               <span className="text-xs font-bold text-indigo-600 mt-auto flex items-center gap-1">Create Story →</span>
             </div>
 
-            {/* Puppet Theater & Sticker Studio */}
-            <div
-              onClick={() => {
-                soundFX.playPop();
-                onOpenPuppetTheater();
-              }}
-              className="bg-white rounded-3xl p-5 border-2 border-pink-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-start gap-2.5 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                🎭
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-800">Puppet Theater</h3>
-                <p className="text-xs text-slate-500 mt-1">Stage animated puppet shows with characters, props, speech bubbles & Action!</p>
-              </div>
-              <span className="text-xs font-bold text-pink-600 mt-auto flex items-center gap-1">Direct Show →</span>
-            </div>
 
             {/* Reading Passport & Adventure Journal */}
             <div
@@ -489,23 +463,6 @@ export default function HomePage({
               <span className="text-xs font-bold text-teal-600 mt-auto flex items-center gap-1">Open Passport →</span>
             </div>
 
-            {/* Atmosphere & Soundscape Mixer */}
-            <div
-              onClick={() => {
-                soundFX.playSparkle();
-                onOpenSoundscape();
-              }}
-              className="bg-white rounded-3xl p-5 border-2 border-sky-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-start gap-2.5 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                🎧
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-800">Soundscape Mixer</h3>
-                <p className="text-xs text-slate-500 mt-1">Blend cozy rain, enchanted woods, and cosmic music box Web Audio synths.</p>
-              </div>
-              <span className="text-xs font-bold text-sky-600 mt-auto flex items-center gap-1">Mix Atmosphere →</span>
-            </div>
 
             {/* Coloring Easel */}
             <div
@@ -525,23 +482,6 @@ export default function HomePage({
               <span className="text-xs font-bold text-rose-500 mt-auto flex items-center gap-1">Open Canvas →</span>
             </div>
 
-            {/* Trophy Badges & Certificate */}
-            <div
-              onClick={() => {
-                soundFX.playSparkle();
-                onOpenCareCertificate();
-              }}
-              className="bg-white rounded-3xl p-5 border-2 border-amber-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-start gap-2.5 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                🏆
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-800">Care Certificate</h3>
-                <p className="text-xs text-slate-500 mt-1">Customize and print your official Kindness & Reading Champion award!</p>
-              </div>
-              <span className="text-xs font-bold text-amber-500 mt-auto flex items-center gap-1">Print Award →</span>
-            </div>
           </div>
         </section>
 

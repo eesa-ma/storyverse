@@ -108,6 +108,12 @@ class NarratorService {
       if (onEndCallback) onEndCallback();
       return;
     }
+    if (sentenceObj.speaker === 'SFX') {
+      if (onEndCallback) {
+        setTimeout(onEndCallback, 900);
+      }
+      return;
+    }
     this.speak(sentenceObj.text, sentenceObj.speaker || 'NARRATOR', onEndCallback);
   }
 

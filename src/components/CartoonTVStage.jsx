@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Tv, Maximize2, Minimize2, Footprints, Clock, Volume2 } from 'lucide-react';
 import CartoonBottleSprite from './CartoonBottleSprite';
+import BottleObject from './BottleObject';
 import AaravSprite from './AaravSprite';
 import ChalkboardCanvas from './ChalkboardCanvas';
 
@@ -120,8 +121,7 @@ export default function CartoonTVStage({
         {/* 2. MAIN ANIMATED CARTOON CLASSROOM SCENE */}
         {scene.background !== 'water-station' ? (
           <div
-            onClick={() => onTapObject('bottle')}
-            className={`absolute inset-0 cursor-pointer transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
+            className={`absolute inset-0 transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
           >
             <img
               src="/aarav_empty_desk_classroom_bg.jpg"
@@ -153,7 +153,7 @@ export default function CartoonTVStage({
               {/* COMIC SPEECH BUBBLE FOR BOTTLE */}
               {speaker === 'BOTTLE' && currentSentence && (
                 <div className="absolute -top-24 -left-12 z-40 bg-white text-slate-900 border-4 border-sky-400 p-3 rounded-2xl shadow-2xl w-48 animate-gentle-bounce">
-                  <span className="text-[10px] font-black uppercase text-sky-600 block">💧 Buddy Bottle</span>
+                  <span className="text-[10px] font-black uppercase text-sky-600 block">Buddy Bottle</span>
                   <p className="text-xs font-black leading-snug">{currentSentence.text}</p>
                   {/* Bubble Tail */}
                   <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-sky-400" />
@@ -206,7 +206,7 @@ export default function CartoonTVStage({
                 waterStationStep === 1 ? 'scale-110 ring-4 ring-sky-400 animate-pulse' : ''
               } flex flex-col items-center bg-white/95 p-4 md:p-6 rounded-3xl border-4 border-sky-400 shadow-xl`}
             >
-              <CartoonBottleSprite mood="refilled" waterLevel={waterStationStep >= 2 ? 100 : 40} />
+              <BottleObject size="medium" mood="refilled" waterLevel={waterStationStep >= 2 ? 100 : 40} className="pointer-events-none" />
               <span className="text-xs font-black text-sky-900 mt-2">2. Fill Bottle</span>
             </div>
 

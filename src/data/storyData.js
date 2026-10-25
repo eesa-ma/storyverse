@@ -92,24 +92,24 @@ export const STORY_SCENES = [
         id: 2,
         text: "Everyone was so excited to go home that the little blue bottle was left behind on the desk.",
         speaker: "NARRATOR",
-        screenState: { lighting: "afternoon", bottleMood: "confused", overlayEmoji: "🎒", activeFocus: "desk", animation: "wiggle" },
+        screenState: { lighting: "afternoon", bottleMood: "anxious", overlayEmoji: "🎒", activeFocus: "desk", animation: "wiggle" },
         plotData: { emotionScore: 65, hydrationLevel: 70, quietnessIndex: 50, storyArcPoint: "Left Behind" }
       },
       {
         id: 3,
         text: "Wait a minute, explorers! Something is missing! Can you help find what was left behind?",
         speaker: "NARRATOR",
-        screenState: { lighting: "afternoon", bottleMood: "lonely", overlayEmoji: "🔎", activeFocus: "desk", animation: "pulse" },
+        screenState: { lighting: "afternoon", bottleMood: "anxious", overlayEmoji: "😰", activeFocus: "desk", animation: "pulse" },
         plotData: { emotionScore: 50, hydrationLevel: 65, quietnessIndex: 60, storyArcPoint: "Search Quest" }
       }
     ],
     objects: [
       {
-        id: "pencil",
-        name: "Pencil",
-        icon: "✏️",
+        id: "id-card",
+        name: "Aarav's ID Card",
+        icon: "🪪",
         isForgottenItem: false,
-        feedback: "Nope! The pencil is already packed in the pencil case.",
+        feedback: "Nope! Aarav's ID card is safely with him. It was not left behind.",
         soundEffect: "pop"
       },
       {
@@ -420,7 +420,7 @@ export const STORY_SCENES = [
       },
       {
         id: 2,
-        text: "Follow the steps: Tap the tap 🚰, fill the bottle 💧, and seal the cap 🧢!",
+        text: "Follow the steps: Tap the tap 🚰, fill the bottle 💧, and seal the bottle cap 🔵!",
         speaker: "NARRATOR",
         screenState: { lighting: "water", bottleMood: "refilled", overlayEmoji: "💧", activeFocus: "water", animation: "glug" },
         plotData: { emotionScore: 98, hydrationLevel: 100, quietnessIndex: 15, storyArcPoint: "Refilling Water" }
@@ -429,7 +429,7 @@ export const STORY_SCENES = [
     steps: [
       { id: 1, label: "Tap the water tap 🚰", icon: "🚰", action: "tap" },
       { id: 2, label: "Tap the bottle 💧", icon: "💧", action: "fill" },
-      { id: 3, label: "Tap the cap to close it 🧢", icon: "🧢", action: "cap" }
+      { id: 3, label: "Tap the bottle cap to close it 🔵", icon: "🔵", action: "cap" }
     ],
     completionText: "💧 Glug-glug!\n“Fresh water for you, buddy!”\n[Taking a long, happy sip]\n“Ahh! Thanks, buddy!” 😊\nAnd just like that, the bottle was refilled and happy again!"
   },
