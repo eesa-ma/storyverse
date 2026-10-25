@@ -17,6 +17,7 @@ export default function StorybookFrame({
   showRocketLaunch = false,
   waterStationStep = 0,
   isBagUnpacked = false,
+  activeObjectId = null,
   onTapObject = () => { }
 }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -84,6 +85,30 @@ export default function StorybookFrame({
   };
 
   const speaker = currentSentence?.speaker || 'NARRATOR';
+  const specialObjects = {
+    tap: { name: 'Water Tap', icon: '🚰' },
+    cap: { name: 'Bottle Cap', icon: '🔵', visualType: 'cap' },
+    clock: { name: 'Classroom Clock', icon: '⏰' },
+    window: { name: 'Sunny Window', icon: '☀️' },
+    aarav: { name: 'Aarav', icon: '👦' },
+    unpacked_books: { name: 'Books', icon: '📚' },
+    unpacked_pencil: { name: 'Pencil', icon: '✏️' },
+    unpacked_lunchbox: { name: 'Lunchbox', icon: '🍱' },
+    unpacked_apple: { name: 'Apple', icon: '🍎' }
+  };
+  const activeObject = scene.objects?.find(object => object.id === activeObjectId) || specialObjects[activeObjectId];
+  const getObjectAnimation = (object) => {
+    if (object?.animation === 'rocket' || object?.soundEffect === 'rocket') return 'animate-rocket';
+    if (object?.animation === 'wiggle') return 'animate-wiggle';
+    if (object?.soundEffect === 'sparkle') return 'animate-sparkle';
+    return 'animate-gentle-bounce';
+  };
+  const bagContents = [
+    { icon: '📚', label: 'Books', className: 'animate-float' },
+    { icon: '✏️', label: 'Pencil', className: 'animate-wiggle' },
+    { icon: '🍱', label: 'Lunchbox', className: 'animate-bounce' },
+    { icon: '🍎', label: 'Apple', className: 'animate-float' }
+  ];
 
   return (
     <div
@@ -119,6 +144,37 @@ export default function StorybookFrame({
         {/* MAIN ILLUSTRATION CANVAS WITH GOLDEN EMBOSSED FRAME */}
         <div className="relative w-full h-full p-2.5 pt-10 pb-6 flex items-center justify-center">
           <div className="relative w-full h-full rounded-[12px] overflow-hidden border-2 border-[#d9b477] shadow-xl bg-slate-900">
+            {activeObject && (
+              <div className="absolute inset-x-0 bottom-8 z-50 flex justify-center pointer-events-none">
+                {activeObjectId === 'bag' ? (
+                  <div className="flex items-end gap-3 rounded-3xl border-4 border-amber-300 bg-amber-50/95 px-4 py-3 shadow-2xl">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-1 text-[10px] font-black uppercase text-white shadow-md">
+                      Bag opened!
+                    </div>
+                    {bagContents.map((item) => (
+                      <div key={item.label} className="flex flex-col items-center gap-1 rounded-2xl bg-white px-2 py-2 shadow-md">
+                        <span className={`text-3xl ${item.className}`}>{item.icon}</span>
+                        <span className="text-[10px] font-black text-amber-950">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1 rounded-3xl border-4 border-amber-300 bg-white/95 px-5 py-3 shadow-2xl animate-gentle-bounce">
+                    {activeObject.visualType === 'cap' ? (
+                      <span className={`relative inline-block h-12 w-24 rounded-lg border-4 border-blue-950 bg-blue-700 shadow-md ${getObjectAnimation(activeObject)}`}>
+                        <span className="absolute inset-x-2 top-2 border-t-4 border-blue-300" />
+                        <span className="absolute inset-x-2 bottom-2 border-b-4 border-blue-900" />
+                      </span>
+                    ) : (
+                      <span className={`text-5xl ${getObjectAnimation(activeObject)}`}>{activeObject.icon}</span>
+                    )}
+                    <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-black uppercase text-amber-900">
+                      {activeObject.name} is moving!
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
             {activeStoryId === 'curious-rocket' ? (
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 flex flex-col justify-between p-4 overflow-hidden select-none">
                 {/* Floating Stars & Planets */}
@@ -356,8 +412,7 @@ export default function StorybookFrame({
               </div>
             ) : scene.background !== 'water-station' ? (
               <div
-                onClick={() => onTapObject('bottle')}
-                className={`absolute inset-0 cursor-pointer transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
+                className={`absolute inset-0 transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
               >
                 <img
                   src="/aarav_empty_desk_classroom_bg.jpg"
@@ -420,7 +475,7 @@ export default function StorybookFrame({
                   {/* STORYBOOK SPEECH BUBBLE FOR BOTTLE */}
                   {speaker === 'BOTTLE' && currentSentence && (
                     <div className="absolute -top-24 -left-12 z-40 bg-[#fffdfa] text-slate-900 border-3 border-sky-400 p-3 rounded-2xl shadow-2xl w-52 animate-gentle-bounce font-serif">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block mb-0.5 font-cinzel">💧 Buddy Bottle</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block mb-0.5 font-cinzel">Buddy Bottle</span>
                       <p className="text-xs font-bold leading-snug text-slate-800 font-reading">"{currentSentence.text}"</p>
                       <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-sky-400" />
                     </div>
@@ -476,7 +531,10 @@ export default function StorybookFrame({
                   className={`cursor-pointer transition-all ${waterStationStep === 2 ? 'scale-110 ring-4 ring-sky-400 animate-pulse' : ''
                     } flex flex-col items-center bg-white/95 p-3 md:p-5 rounded-3xl border-4 border-sky-300 shadow-xl`}
                 >
-                  <span className="text-5xl md:text-6xl">🧢</span>
+                  <span className="relative inline-block h-10 w-20 rounded-lg border-4 border-blue-950 bg-blue-700 shadow-md">
+                    <span className="absolute inset-x-1 top-2 border-t-2 border-blue-300" />
+                    <span className="absolute inset-x-1 bottom-2 border-b-2 border-blue-900" />
+                  </span>
                   <span className="text-xs font-black text-sky-900 mt-2 font-serif">3. Close Cap</span>
                 </div>
               </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, Volume2, Mic, MicOff, HelpCircle, Award, TrendingUp, Drama, BookMarked, Sparkles, ArrowLeft, ArrowRight, Play, Pause, X, Wrench } from 'lucide-react';
 import Navbar from './components/Navbar';
 import StorybookFrame from './components/StorybookFrame';
+import BottleObject from './components/BottleObject';
 import InteractivePanel from './components/InteractivePanel';
 import StoryChapterMap from './components/StoryChapterMap';
 import HomePage from './components/HomePage';
@@ -37,6 +38,16 @@ const ALL_STORY_SCENES = {
   'bear-lost-pencil': BEAR_STORY_SCENES
 };
 
+const ANIMATION_DETAILS = {
+  bounce: { label: 'Bouncing', icon: '⬆️', className: 'animate-gentle-bounce' },
+  sparkle: { label: 'Sparkling', icon: '✨', className: 'animate-sparkle' },
+  rocket: { label: 'Rocket launch', icon: '🚀', className: 'animate-rocket' },
+  wiggle: { label: 'Wiggling', icon: '〰️', className: 'animate-wiggle' },
+  pulse: { label: 'Pulsing', icon: '💓', className: 'animate-pulse-ring' },
+  float: { label: 'Floating', icon: '🎈', className: 'animate-float' },
+  glug: { label: 'Filling up', icon: '💧', className: 'animate-pulse' }
+};
+
 export default function App() {
   const [activeView, setActiveView] = useState('home'); // 'home' | 'reader'
   const [activeStoryId, setActiveStoryId] = useState('dolly-midnight-adventure');
@@ -53,7 +64,7 @@ export default function App() {
   // Educational Learning Feature States
   const [isBedtimeMode, setIsBedtimeMode] = useState(false);
   const [activeLanguage, setActiveLanguage] = useState('en');
-  const [unlockedBadges, setUnlockedBadges] = useState(['story-explorer']);
+  const [unlockedBadges, setUnlockedBadges] = useState([]);
   const [learnedWords, setLearnedWords] = useState([]);
 
   // Modals
@@ -69,6 +80,8 @@ export default function App() {
   const [showReadingPassportModal, setShowReadingPassportModal] = useState(false);
   const [showStoryArcModal, setShowStoryArcModal] = useState(false);
   const [showToolsPanel, setShowToolsPanel] = useState(false);
+  const [objectPopup, setObjectPopup] = useState(null);
+  const [activeObjectId, setActiveObjectId] = useState(null);
 
   // FX & Animation States
   const [bottleState, setBottleState] = useState('happy');
@@ -84,6 +97,11 @@ export default function App() {
   // Safely clamp sentence index within bounds
   const safeSentenceIndex = Math.min(currentSentenceIndex, Math.max(0, currentSentences.length - 1));
   const currentSentence = currentSentences[safeSentenceIndex] || currentSentences[0];
+  const currentAnimation = ANIMATION_DETAILS[currentSentence?.screenState?.animation] || {
+    label: 'Story moment',
+    icon: '📖',
+    className: ''
+  };
 
   // Unlock badge helper
   const unlockBadge = (badgeId) => {
@@ -118,11 +136,26 @@ export default function App() {
       setBottleState(currentSentence.screenState.bottleMood);
     }
 
-    // Trigger special sound FX for sentence
-    if (currentSentence.screenState?.overlayEmoji === '🔔' || currentSentence.text?.includes('🔔')) {
+    // Sound-effect lines use audio only; they must never be spoken by the narrator.
+    const soundText = currentSentence.text?.toLowerCase() || '';
+    const isSoundEffectSentence = currentSentence.speaker === 'SFX';
+    if (currentSentence.screenState?.overlayEmoji === '🔔' || soundText.includes('🔔')) {
       soundFX.playSchoolBell();
-    } else if (currentSentence.speaker === 'SFX') {
+    } else if (currentSentence.screenState?.overlayEmoji === '👣' || soundText.includes('footsteps')) {
+      soundFX.playFootsteps();
+    } else if (currentSentence.screenState?.overlayEmoji === '🚪' || soundText.includes('door')) {
+      soundFX.playDoorClack();
+    } else if (soundText.includes('whoosh') || soundText.includes('blast off')) {
+      soundFX.playRocketWhoosh();
+      setShowRocketLaunch(true);
+      setTimeout(() => setShowRocketLaunch(false), 600);
+      unlockBadge('space-cadet');
+    } else if (soundText.includes('clink') || soundText.includes('click') || soundText.includes('sparkle')) {
+      soundFX.playSparkle();
+    } else if (soundText.includes('pop') || soundText.includes('achoo')) {
       soundFX.playPop();
+    } else if (soundText.includes('grrr') || soundText.includes('rock moved')) {
+      soundFX.playBoing();
     } else if (currentSentence.screenState?.animation === 'rocket') {
       soundFX.playRocketWhoosh();
       setShowRocketLaunch(true);
@@ -135,7 +168,7 @@ export default function App() {
     }
 
     // Speak sentence with fallback safety callback for Auto-Play Mode
-    if (narratorEnabled) {
+    if (narratorEnabled && !isSoundEffectSentence) {
       narrator.speakSentence(currentSentence, () => {
         if (isAutoPlayActive) {
           autoPlayTimeoutRef.current = setTimeout(() => {
@@ -273,6 +306,45 @@ export default function App() {
 
   // Direct click interaction on stage objects
   const handleCanvasObjectClick = (objectType) => {
+    const tappedObject = currentScene.objects?.find(object => object.id === objectType);
+    const bottleEmotion = currentScene.id === 2 || currentScene.id === 3
+      ? { emotion: 'Anxious', emotionIcon: '😰' }
+      : null;
+    const specialObjectMessages = {
+      tap: { name: 'Water Tap', icon: '🚰', emotion: 'Refreshing', emotionIcon: '💦', message: 'Turn on the tap to fill Buddy with fresh water!' },
+      cap: { name: 'Bottle Cap', icon: '🔵', visualType: 'cap', emotion: 'Careful', emotionIcon: '🤗', message: 'Close the bottle cap tightly so Buddy is ready for the journey!' },
+      clock: { name: 'Classroom Clock', icon: '⏰', emotion: 'Calm', emotionIcon: '😌', message: 'Tick-tock! The quiet classroom is waiting.' },
+      window: { name: 'Sunny Window', icon: '☀️', emotion: 'Cheerful', emotionIcon: '😊', message: 'Warm sunlight shines into the classroom.' },
+      aarav: { name: 'Aarav', icon: '👦', emotion: 'Friendly', emotionIcon: '👋', message: 'Hi there! Ready to turn the page?' },
+      unpacked_books: { name: 'Books', icon: '📚', emotion: 'Ready', emotionIcon: '📖', message: 'The books pop out of the schoolbag, ready for reading!' },
+      unpacked_pencil: { name: 'Pencil', icon: '✏️', emotion: 'Creative', emotionIcon: '🎨', message: 'The pencil pops out, ready to write!' },
+      unpacked_lunchbox: { name: 'Lunchbox', icon: '🍱', emotion: 'Prepared', emotionIcon: '😊', message: 'The lunchbox is packed and ready for lunch!' },
+      unpacked_apple: { name: 'Apple', icon: '🍎', emotion: 'Healthy', emotionIcon: '💚', message: 'The apple pops out as a healthy snack!' }
+    };
+    const popupObject = tappedObject
+      ? {
+          name: tappedObject.name,
+          icon: tappedObject.icon,
+          emotion: tappedObject.emotion || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotion : tappedObject.soundEffect === 'rocket' ? 'Excited' : tappedObject.soundEffect === 'sparkle' ? 'Joyful' : 'Curious'),
+          emotionIcon: tappedObject.emotionIcon || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotionIcon : tappedObject.soundEffect === 'rocket' ? '🤩' : tappedObject.soundEffect === 'sparkle' ? '✨' : '🙂'),
+          message: tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint
+        }
+      : specialObjectMessages[objectType] || {
+          name: objectType === 'cap' ? 'Bottle Cap' : 'Story Object',
+          icon: objectType === 'cap' ? '🔵' : '✨',
+          emotion: 'Curious',
+          emotionIcon: '🙂',
+          message: objectType === 'cap'
+            ? 'This is Buddy’s bottle cap. Tap it to seal the bottle!'
+            : 'You found a special story object!'
+        };
+
+    setObjectPopup(popupObject);
+    setActiveObjectId(objectType);
+    window.setTimeout(() => {
+      setActiveObjectId(currentId => currentId === objectType ? null : currentId);
+    }, 2200);
+
     if (objectType === 'bottle') {
       soundFX.playSparkle();
       setShowSparkle(true);
@@ -309,6 +381,17 @@ export default function App() {
         setShowSparkle(true);
         setTimeout(() => setShowSparkle(false), 600);
       }
+    } else {
+      if (tappedObject) {
+        if (tappedObject.soundEffect === 'sparkle' || tappedObject.soundEffect === 'rocket') {
+          soundFX.playSparkle();
+        } else {
+          soundFX.playPop();
+        }
+        if (narratorEnabled) {
+          narrator.speak(tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint || `You found the ${tappedObject.name}!`, 'NARRATOR');
+        }
+      }
     }
   };
 
@@ -342,6 +425,8 @@ export default function App() {
     setShowSparkle(false);
     setShowRocketLaunch(false);
     setIsAutoPlayActive(false);
+    setObjectPopup(null);
+    setActiveObjectId(null);
     setActiveView('reader');
     soundFX.playSparkle();
     unlockBadge('story-explorer');
@@ -509,6 +594,9 @@ export default function App() {
       {/* Bedtime Atmosphere Overlay */}
       <BedtimeCalmOverlay isActive={isBedtimeMode} />
 
+      {/* Quiet story-world backdrop behind the open book */}
+      {!isBedtimeMode && <div className="reader-world-backdrop" aria-hidden="true" />}
+
       <Navbar
         currentSceneId={currentSceneId}
         totalScenes={currentStoryScenes.length}
@@ -533,6 +621,50 @@ export default function App() {
       />
 
       <main className="w-full max-w-7xl mx-auto flex-1 p-3 md:p-5 flex flex-col gap-4 items-stretch z-10">
+        {objectPopup && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+            onClick={() => {
+              setObjectPopup(null);
+              setActiveObjectId(null);
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${objectPopup.name} message`}
+          >
+              <div
+              className="w-full max-w-sm rounded-3xl border-4 border-amber-300 bg-[#fffdf8] p-6 text-center shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mb-2 flex h-16 items-center justify-center text-5xl" aria-hidden="true">
+                {objectPopup.visualType === 'cap' ? (
+                  <span className="relative inline-block h-8 w-16 rounded-md border-4 border-blue-950 bg-blue-700 shadow-md">
+                    <span className="absolute inset-x-1 top-1 border-t-2 border-blue-300" />
+                    <span className="absolute inset-x-1 bottom-1 border-b-2 border-blue-900" />
+                  </span>
+                ) : objectPopup.name?.toLowerCase().includes('bottle') ? (
+                  <BottleObject size="medium" className="pointer-events-none" />
+                ) : objectPopup.icon}
+              </div>
+              <h2 className="text-xl font-black text-amber-950">{objectPopup.name}</h2>
+              <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-black text-amber-900">
+                <span aria-hidden="true">{objectPopup.emotionIcon}</span>
+                <span>Feeling {objectPopup.emotion}</span>
+              </div>
+              <p className="mt-3 text-base font-bold leading-relaxed text-slate-700">{objectPopup.message}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setObjectPopup(null);
+                  setActiveObjectId(null);
+                }}
+                className="mt-5 rounded-full bg-amber-500 px-6 py-2 font-black text-white shadow-md transition hover:bg-amber-600 active:scale-95"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* MAIN STORYBOOK CARD */}
         <div
@@ -557,6 +689,7 @@ export default function App() {
                 showSparkle={showSparkle}
                 showRocketLaunch={showRocketLaunch}
                 waterStationStep={waterStep}
+                activeObjectId={activeObjectId}
                 onTapObject={handleCanvasObjectClick}
               />
             </div>
@@ -578,9 +711,17 @@ export default function App() {
                   >
                     Ch. {currentSceneId}
                   </span>
-                  <span className="text-base font-black text-[#102b57] truncate max-w-[280px]">
-                    {currentScene.title}
-                  </span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg leading-none" aria-hidden="true">{activeStoryObj.coverEmoji}</span>
+                      <span className="text-base font-black text-[#102b57] truncate max-w-[280px]">
+                        {currentScene.title}
+                      </span>
+                    </div>
+                    <span className="block truncate text-[10px] font-bold uppercase tracking-wider text-[#8a7890]">
+                      {activeStoryObj.category} · {activeStoryObj.badge}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
@@ -628,8 +769,8 @@ export default function App() {
 
                 {/* Speaker label */}
                 <div className="flex items-center gap-2">
-                  <span className="text-lg leading-none">
-                    {currentSentence?.speaker === 'BOTTLE' ? '💧'
+                  <span className="text-lg leading-none flex items-center">
+                    {currentSentence?.speaker === 'BOTTLE' ? <BottleObject size="small" className="pointer-events-none" />
                       : currentSentence?.speaker === 'AARAV' ? '👦'
                       : currentSentence?.speaker === 'LILY' ? '🎀'
                       : currentSentence?.speaker === 'GIRL' ? '👧'
@@ -653,6 +794,10 @@ export default function App() {
                       : 'Narrator'}
                   </span>
                   <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, #e6dcc8, transparent)' }} />
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-800 shadow-sm">
+                    <span className={currentAnimation.className} aria-hidden="true">{currentAnimation.icon}</span>
+                    Animation: {currentAnimation.label}
+                  </span>
                 </div>
 
                 {/* STORY SENTENCES — big, prominent, immersive */}
@@ -660,22 +805,39 @@ export default function App() {
                   {currentSentences.map((sent, idx) => {
                     const isCurrent = idx === safeSentenceIndex;
                     const isPast = idx < safeSentenceIndex;
+                    const sentenceAnimation = ANIMATION_DETAILS[sent.screenState?.animation] || {
+                      label: 'Story moment',
+                      icon: '📖',
+                      className: ''
+                    };
                     return (
-                      <p
+                      <div
                         key={sent.id || idx}
                         onClick={() => setCurrentSentenceIndex(idx)}
-                        className={`cursor-pointer transition-all duration-300 leading-relaxed ${
+                        className={`group flex items-start gap-2 rounded-2xl border px-3 py-2 cursor-pointer transition-all duration-300 ${
                           isCurrent
-                            ? 'text-xl md:text-[23px] font-black text-[#102b57]'
+                            ? 'border-amber-200 bg-amber-50/70 text-xl md:text-[23px] font-black text-[#102b57] shadow-sm'
                             : isPast
-                            ? 'text-sm font-medium text-slate-300 hover:text-slate-500'
-                            : 'text-sm font-medium text-slate-400 hover:text-slate-600'
+                            ? 'border-transparent text-sm font-medium text-slate-300 hover:border-slate-200 hover:text-slate-500'
+                            : 'border-transparent text-sm font-medium text-slate-400 hover:border-slate-200 hover:text-slate-600'
                         }`}
                       >
-                        {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none mr-0.5">“</span>}
-                        {isCurrent ? renderInteractiveText(sent.text) : sent.text}
-                        {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none ml-0.5">”</span>}
-                      </p>
+                        <span className={`mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm ${
+                          isCurrent ? 'bg-white shadow-sm' : 'bg-slate-100/70 opacity-60'
+                        } ${isCurrent ? sentenceAnimation.className : ''}`} title={`Animation: ${sentenceAnimation.label}`}>
+                          {sentenceAnimation.icon}
+                        </span>
+                        <span className="leading-relaxed">
+                          {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none mr-0.5">“</span>}
+                          {isCurrent ? renderInteractiveText(sent.text) : sent.text}
+                          {isCurrent && <span className="text-amber-500 font-black text-2xl leading-none ml-0.5">”</span>}
+                          <span className={`ml-2 align-middle text-[10px] font-black uppercase tracking-wide ${
+                            isCurrent ? 'text-amber-700' : 'text-slate-400'
+                          }`}>
+                            {sentenceAnimation.label}
+                          </span>
+                        </span>
+                      </div>
                     );
                   })}
                 </div>
@@ -796,6 +958,9 @@ export default function App() {
           <StoryChapterMap
             currentScene={currentScene}
             scenes={currentStoryScenes}
+            storyId={activeStoryId}
+            storyTitle={activeStoryObj.title}
+            storyEmoji={activeStoryObj.coverEmoji}
             currentSentenceIndex={safeSentenceIndex}
             onSelectScene={(sceneId) => {
               narrator.cancel();

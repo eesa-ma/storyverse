@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, CheckCircle2, Search, Heart, Award, ShieldCheck, Volume2 } from 'lucide-react';
+import BottleObject from './BottleObject';
 
 export default function InteractivePanel({
   scene,
@@ -13,6 +14,10 @@ export default function InteractivePanel({
 }) {
   const [inspectedObject, setInspectedObject] = React.useState(null);
 
+  React.useEffect(() => {
+    setInspectedObject(null);
+  }, [scene?.id, scene?.title]);
+
   if (!scene) return null;
 
   const handleDeskItemClick = (objId) => {
@@ -20,22 +25,30 @@ export default function InteractivePanel({
     onObjectTap(objId);
   };
 
+  const getObjectFeedback = (object) => (
+    object?.dialogue
+    || object?.narratorReply
+    || object?.feedback
+    || object?.hint
+    || `You found the ${object?.name || 'story item'}!`
+  );
+
   return (
     <div className="w-full my-1 select-none font-['Fredoka',sans-serif]">
 
       {/* SCENE 1: Explore Classroom Desk Grid */}
-      {scene.id === 1 && (
+      {scene.id === 1 && scene.objects && (
         <div className="flex flex-col gap-3">
           
           <div className="grid grid-cols-2 gap-2">
-            {/* Left Header: Desk Explorer */}
+            {/* Left Header: Story Explorer */}
             <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-2xl flex items-center gap-2 shadow-sm">
               <div className="bg-emerald-800 text-emerald-50 p-1.5 rounded-full">
                 <Search className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <p className="text-[13px] font-bold text-emerald-900 leading-tight">DESK EXPLORER ✨</p>
-                <p className="text-[10px] font-semibold text-emerald-700">Tap an item to inspect your Buddy's gear!</p>
+                <p className="text-[13px] font-bold text-emerald-900 leading-tight">STORY EXPLORER ✨</p>
+                <p className="text-[10px] font-semibold text-emerald-700">{scene.instruction || 'Tap an item to inspect it!'}</p>
               </div>
             </div>
             
@@ -56,7 +69,9 @@ export default function InteractivePanel({
                     inspectedObject === obj.id ? 'ring-2 ring-slate-400 scale-105' : ''
                   }`}
                 >
-                  <span className="text-3xl group-hover:scale-110 transition-transform mb-1">{obj.icon}</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform mb-1">
+                    {obj.id === 'bottle' ? <BottleObject size="small" className="pointer-events-none" /> : obj.icon}
+                  </span>
                   <span className={`text-[10px] font-black uppercase tracking-wide ${textColors[idx % 4]}`}>{obj.name}</span>
                 </button>
               );
@@ -65,12 +80,7 @@ export default function InteractivePanel({
 
           {inspectedObject && (
             <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-center text-xs font-bold text-slate-700 shadow-inner">
-              <span>
-                {inspectedObject === 'bottle' && '💧 Buddy Bottle: A special blue water bottle with a rocket sticker!'}
-                {inspectedObject === 'bag' && '🎒 Schoolbag: Aarav\'s sturdy red backpack.'}
-                {inspectedObject === 'pencil' && '✏️ Pencil: Ready for drawing adventures!'}
-                {inspectedObject === 'sticker' && '🚀 Rocket Sticker: Buddy\'s emblem of hope and speed!'}
-              </span>
+              <span>{getObjectFeedback(scene.objects.find((object) => object.id === inspectedObject))}</span>
             </div>
           )}
         </div>
@@ -86,7 +96,7 @@ export default function InteractivePanel({
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'pencil', label: '✏️ Pencil', isCorrect: false },
+              { id: 'id-card', label: '🪪 Aarav\'s ID Card', isCorrect: false },
               { id: 'lunchbox', label: '🍱 Lunchbox', isCorrect: false },
               { id: 'bottle', label: '💧 Blue Bottle', isCorrect: true }
             ].map((ans) => {
@@ -102,7 +112,10 @@ export default function InteractivePanel({
                       : 'bg-[#fffdf8] border-amber-300 hover:bg-amber-200/60 text-amber-950 shadow-sm'
                     }`}
                 >
-                  <span className="text-sm font-serif">{ans.label}</span>
+                  <span className="text-sm font-serif flex flex-col items-center">
+                    {ans.id === 'bottle' && <BottleObject size="small" className="pointer-events-none" />}
+                    {ans.label}
+                  </span>
                 </button>
               );
             })}
@@ -283,7 +296,7 @@ export default function InteractivePanel({
             {[
               { step: 1, label: '1. Tap Water Tap 🚰' },
               { step: 2, label: '2. Fill Bottle 💧' },
-              { step: 3, label: '3. Close Cap 🧢' }
+              { step: 3, label: '3. Close Bottle Cap 🔵' }
             ].map((st) => {
               const isDone = waterStep >= st.step;
               return (
@@ -438,7 +451,7 @@ export default function InteractivePanel({
 
           {inspectedObject && (
             <div className="bg-white/90 border border-amber-400 p-2 rounded-xl text-center text-xs font-bold text-amber-950 shadow-inner">
-              {scene.objects.find(o => o.id === inspectedObject)?.dialogue || scene.objects.find(o => o.id === inspectedObject)?.narratorReply}
+              {getObjectFeedback(scene.objects.find((object) => object.id === inspectedObject))}
             </div>
           )}
         </div>

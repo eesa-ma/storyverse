@@ -3,6 +3,7 @@ import React from 'react';
 export default function CartoonBottleSprite({
   mood = 'happy',
   waterLevel = 80, // 0 to 100
+  size = 'default',
   className = '',
   onClick = () => { }
 }) {
@@ -42,6 +43,7 @@ export default function CartoonBottleSprite({
         };
       case 'listening':
       case 'confused':
+      case 'anxious':
         return {
           eyeLeft: <circle cx="48" cy="70" r="6" fill="#0f172a" />,
           eyeRight: <circle cx="72" cy="72" r="3.5" fill="#0f172a" />,
@@ -53,7 +55,9 @@ export default function CartoonBottleSprite({
               <line x1="68" y1="62" x2="78" y2="58" />
             </g>
           ),
-          mouth: <circle cx="60" cy="85" r="4" fill="#0f172a" />
+          mouth: mood === 'anxious'
+            ? <path d="M 51 87 Q 60 81 69 87" stroke="#0f172a" strokeWidth="3" fill="none" strokeLinecap="round" />
+            : <circle cx="60" cy="85" r="4" fill="#0f172a" />
         };
       case 'hopeful':
         return {
@@ -94,6 +98,7 @@ export default function CartoonBottleSprite({
         return 'animate-bounce scale-110';
       case 'hopeful':
       case 'listening':
+      case 'anxious':
         return 'animate-gentle-bounce';
       default:
         return 'hover:scale-105 transition-transform';
@@ -102,6 +107,11 @@ export default function CartoonBottleSprite({
 
   // Water level height (max 100px body)
   const calculatedWaterY = 135 - (waterLevel / 100) * 85;
+  const bottleSize = size === 'small'
+    ? 'w-10 h-14'
+    : size === 'medium'
+      ? 'w-14 h-20'
+      : 'w-20 h-28 md:w-24 md:h-24';
 
   return (
     <div
@@ -111,7 +121,7 @@ export default function CartoonBottleSprite({
     >
       <svg
         viewBox="0 0 120 160"
-        className="w-20 h-28 md:w-24 md:h-24 drop-shadow-2xl overflow-visible"
+        className={`${bottleSize} drop-shadow-2xl overflow-visible`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
