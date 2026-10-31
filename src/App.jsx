@@ -131,14 +131,13 @@ export default function App() {
 
     if (autoPlayTimeoutRef.current) clearTimeout(autoPlayTimeoutRef.current);
 
-    // Apply mood from sentence screenState
-    if (currentSentence.screenState?.bottleMood) {
+    // Apply mood from sentence screenState (Bottle story only)
+    if (activeStoryId === 'bottle-that-waited' && currentSentence.screenState?.bottleMood) {
       setBottleState(currentSentence.screenState.bottleMood);
     }
 
     // Sound-effect lines use audio only; they must never be spoken by the narrator.
     const soundText = currentSentence.text?.toLowerCase() || '';
-    const isSoundEffectSentence = currentSentence.speaker === 'SFX';
     if (currentSentence.screenState?.overlayEmoji === '🔔' || soundText.includes('🔔')) {
       soundFX.playSchoolBell();
     } else if (currentSentence.screenState?.overlayEmoji === '👣' || soundText.includes('footsteps')) {
@@ -146,29 +145,33 @@ export default function App() {
     } else if (currentSentence.screenState?.overlayEmoji === '🚪' || soundText.includes('door')) {
       soundFX.playDoorClack();
     } else if (soundText.includes('whoosh') || soundText.includes('blast off')) {
-      soundFX.playRocketWhoosh();
+      soundFX.playWhoosh();
       setShowRocketLaunch(true);
       setTimeout(() => setShowRocketLaunch(false), 600);
       unlockBadge('space-cadet');
-    } else if (soundText.includes('clink') || soundText.includes('click') || soundText.includes('sparkle')) {
-      soundFX.playSparkle();
-    } else if (soundText.includes('pop') || soundText.includes('achoo')) {
+    } else if (soundText.includes('clink')) {
+      soundFX.playClink();
+    } else if (soundText.includes('click')) {
+      soundFX.playClick();
+    } else if (soundText.includes('achoo')) {
+      soundFX.playAchoo();
+    } else if (soundText.includes('pop')) {
       soundFX.playPop();
     } else if (soundText.includes('grrr') || soundText.includes('rock moved')) {
       soundFX.playBoing();
-    } else if (currentSentence.screenState?.animation === 'rocket') {
-      soundFX.playRocketWhoosh();
-      setShowRocketLaunch(true);
-      setTimeout(() => setShowRocketLaunch(false), 600);
-      unlockBadge('space-cadet');
-    } else if (currentSentence.screenState?.animation === 'sparkle') {
+    } else if (soundText.includes('sparkle') || currentSentence.screenState?.animation === 'sparkle') {
       soundFX.playSparkle();
       setShowSparkle(true);
       setTimeout(() => setShowSparkle(false), 500);
+    } else if (currentSentence.screenState?.animation === 'rocket') {
+      soundFX.playWhoosh();
+      setShowRocketLaunch(true);
+      setTimeout(() => setShowRocketLaunch(false), 600);
+      unlockBadge('space-cadet');
     }
 
     // Speak sentence with fallback safety callback for Auto-Play Mode
-    if (narratorEnabled && !isSoundEffectSentence) {
+    if (narratorEnabled) {
       narrator.speakSentence(currentSentence, () => {
         if (isAutoPlayActive) {
           autoPlayTimeoutRef.current = setTimeout(() => {
@@ -306,11 +309,10 @@ export default function App() {
 
   // Direct click interaction on stage objects
   const handleCanvasObjectClick = (objectType) => {
+    const isBottleStory = activeStoryId === 'bottle-that-waited';
     const tappedObject = currentScene.objects?.find(object => object.id === objectType);
-    const bottleEmotion = currentScene.id === 2 || currentScene.id === 3
-      ? { emotion: 'Anxious', emotionIcon: '😰' }
-      : null;
-    const specialObjectMessages = {
+
+    const specialBottleMessages = {
       tap: { name: 'Water Tap', icon: '🚰', emotion: 'Refreshing', emotionIcon: '💦', message: 'Turn on the tap to fill Buddy with fresh water!' },
       cap: { name: 'Bottle Cap', icon: '🔵', visualType: 'cap', emotion: 'Careful', emotionIcon: '🤗', message: 'Close the bottle cap tightly so Buddy is ready for the journey!' },
       clock: { name: 'Classroom Clock', icon: '⏰', emotion: 'Calm', emotionIcon: '😌', message: 'Tick-tock! The quiet classroom is waiting.' },
@@ -321,23 +323,27 @@ export default function App() {
       unpacked_lunchbox: { name: 'Lunchbox', icon: '🍱', emotion: 'Prepared', emotionIcon: '😊', message: 'The lunchbox is packed and ready for lunch!' },
       unpacked_apple: { name: 'Apple', icon: '🍎', emotion: 'Healthy', emotionIcon: '💚', message: 'The apple pops out as a healthy snack!' }
     };
-    const popupObject = tappedObject
-      ? {
-          name: tappedObject.name,
-          icon: tappedObject.icon,
-          emotion: tappedObject.emotion || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotion : tappedObject.soundEffect === 'rocket' ? 'Excited' : tappedObject.soundEffect === 'sparkle' ? 'Joyful' : 'Curious'),
-          emotionIcon: tappedObject.emotionIcon || (objectType === 'bottle' && bottleEmotion ? bottleEmotion.emotionIcon : tappedObject.soundEffect === 'rocket' ? '🤩' : tappedObject.soundEffect === 'sparkle' ? '✨' : '🙂'),
-          message: tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint
-        }
-      : specialObjectMessages[objectType] || {
-          name: objectType === 'cap' ? 'Bottle Cap' : 'Story Object',
-          icon: objectType === 'cap' ? '🔵' : '✨',
-          emotion: 'Curious',
-          emotionIcon: '🙂',
-          message: objectType === 'cap'
-            ? 'This is Buddy’s bottle cap. Tap it to seal the bottle!'
-            : 'You found a special story object!'
-        };
+
+    let popupObject;
+    if (tappedObject) {
+      popupObject = {
+        name: tappedObject.name,
+        icon: tappedObject.icon,
+        emotion: tappedObject.emotion || (objectType === 'bottle' ? 'Happy' : tappedObject.soundEffect === 'rocket' ? 'Excited' : tappedObject.soundEffect === 'sparkle' ? 'Joyful' : 'Curious'),
+        emotionIcon: tappedObject.emotionIcon || (objectType === 'bottle' ? '💧' : tappedObject.soundEffect === 'rocket' ? '🤩' : tappedObject.soundEffect === 'sparkle' ? '✨' : '🙂'),
+        message: tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint
+      };
+    } else if (isBottleStory && specialBottleMessages[objectType]) {
+      popupObject = specialBottleMessages[objectType];
+    } else {
+      popupObject = {
+        name: 'Story Secret',
+        icon: '✨',
+        emotion: 'Curious',
+        emotionIcon: '🙂',
+        message: 'You tapped a special story moment!'
+      };
+    }
 
     setObjectPopup(popupObject);
     setActiveObjectId(objectType);
@@ -345,52 +351,75 @@ export default function App() {
       setActiveObjectId(currentId => currentId === objectType ? null : currentId);
     }, 2200);
 
-    if (objectType === 'bottle') {
-      soundFX.playSparkle();
-      setShowSparkle(true);
-      setTimeout(() => setShowSparkle(false), 500);
-      const moods = ['happy', 'excited', 'hopeful', 'refilled'];
-      const nextMood = moods[(moods.indexOf(bottleState) + 1) % moods.length];
-      setBottleState(nextMood);
-      if (narratorEnabled && currentSentence) {
-        narrator.speakSentence(currentSentence);
-      }
-    } else if (objectType === 'aarav') {
-      soundFX.playSparkle();
-      setShowSparkle(true);
-      setTimeout(() => setShowSparkle(false), 500);
-      if (narratorEnabled) {
-        narrator.speak("Hi there! Ready to turn the page?", 'AARAV');
-      }
-    } else if (objectType === 'clock') {
-      soundFX.playSchoolBell();
-    } else if (objectType === 'window') {
-      soundFX.playSparkle();
-      setShowSparkle(true);
-      setTimeout(() => setShowSparkle(false), 500);
-    } else if (currentSceneId === 8) {
-      if (objectType === 'tap' && waterStep === 0) {
-        setWaterStep(1);
-        soundFX.playWaterGlug();
-      } else if (objectType === 'bottle' && waterStep === 1) {
-        setWaterStep(2);
-        soundFX.playWaterGlug();
-      } else if (objectType === 'cap' && waterStep === 2) {
-        setWaterStep(3);
+    // Audio & Interaction Handling strictly isolated per story
+    if (isBottleStory) {
+      if (objectType === 'bottle') {
         soundFX.playSparkle();
         setShowSparkle(true);
-        setTimeout(() => setShowSparkle(false), 600);
+        setTimeout(() => setShowSparkle(false), 500);
+        const moods = ['happy', 'excited', 'hopeful', 'refilled'];
+        const nextMood = moods[(moods.indexOf(bottleState) + 1) % moods.length];
+        setBottleState(nextMood);
+        if (narratorEnabled && currentSentence) {
+          narrator.speakSentence(currentSentence);
+        }
+      } else if (objectType === 'aarav') {
+        soundFX.playSparkle();
+        setShowSparkle(true);
+        setTimeout(() => setShowSparkle(false), 500);
+        if (narratorEnabled) {
+          narrator.speak("Hi there! Ready to turn the page?", 'AARAV');
+        }
+      } else if (objectType === 'clock') {
+        soundFX.playSchoolBell();
+      } else if (objectType === 'window') {
+        soundFX.playSparkle();
+        setShowSparkle(true);
+        setTimeout(() => setShowSparkle(false), 500);
+      } else if (currentSceneId === 8) {
+        if (objectType === 'tap' && waterStep === 0) {
+          setWaterStep(1);
+          soundFX.playWaterGlug();
+        } else if (objectType === 'bottle' && waterStep === 1) {
+          setWaterStep(2);
+          soundFX.playWaterGlug();
+        } else if (objectType === 'cap' && waterStep === 2) {
+          setWaterStep(3);
+          soundFX.playSparkle();
+          setShowSparkle(true);
+          setTimeout(() => setShowSparkle(false), 600);
+        }
+      } else if (tappedObject) {
+        soundFX.playPop();
+        if (narratorEnabled) {
+          narrator.speak(tappedObject.dialogue || tappedObject.narratorReply || `You found the ${tappedObject.name}!`, 'NARRATOR');
+        }
       }
     } else {
+      // Dolly, Secret Cave, Rocket, Bear independent interaction handling
       if (tappedObject) {
-        if (tappedObject.soundEffect === 'sparkle' || tappedObject.soundEffect === 'rocket') {
+        if (tappedObject.soundEffect === 'sparkle') {
           soundFX.playSparkle();
+          setShowSparkle(true);
+          setTimeout(() => setShowSparkle(false), 500);
+        } else if (tappedObject.soundEffect === 'rocket' || tappedObject.soundEffect === 'whoosh') {
+          soundFX.playWhoosh();
+          setShowRocketLaunch(true);
+          setTimeout(() => setShowRocketLaunch(false), 600);
+        } else if (tappedObject.soundEffect === 'clink') {
+          soundFX.playClink();
+        } else if (tappedObject.soundEffect === 'click') {
+          soundFX.playClick();
+        } else if (tappedObject.soundEffect === 'achoo') {
+          soundFX.playAchoo();
         } else {
           soundFX.playPop();
         }
         if (narratorEnabled) {
-          narrator.speak(tappedObject.dialogue || tappedObject.narratorReply || tappedObject.feedback || tappedObject.hint || `You found the ${tappedObject.name}!`, 'NARRATOR');
+          narrator.speak(tappedObject.dialogue || tappedObject.narratorReply || tappedObject.hint || `You discovered the ${tappedObject.name}!`, 'NARRATOR');
         }
+      } else {
+        soundFX.playPop();
       }
     }
   };
@@ -537,6 +566,7 @@ export default function App() {
           <CareCertificateModal
             isOpen={showCareCertificateModal}
             onClose={() => setShowCareCertificateModal(false)}
+            storyId={activeStoryId}
             storyTitle={activeStoryObj.title}
           />
         )}
@@ -566,6 +596,8 @@ export default function App() {
           <StoryArcModal
             isOpen={showStoryArcModal}
             onClose={() => setShowStoryArcModal(false)}
+            storyId={activeStoryId}
+            storyTitle={activeStoryObj.title}
             currentScene={currentScene}
             scenes={currentStoryScenes}
             currentSentenceIndex={safeSentenceIndex}
@@ -637,12 +669,12 @@ export default function App() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mb-2 flex h-16 items-center justify-center text-5xl" aria-hidden="true">
-                {objectPopup.visualType === 'cap' ? (
+                {objectPopup.visualType === 'cap' && activeStoryId === 'bottle-that-waited' ? (
                   <span className="relative inline-block h-8 w-16 rounded-md border-4 border-blue-950 bg-blue-700 shadow-md">
                     <span className="absolute inset-x-1 top-1 border-t-2 border-blue-300" />
                     <span className="absolute inset-x-1 bottom-1 border-b-2 border-blue-900" />
                   </span>
-                ) : objectPopup.name?.toLowerCase().includes('bottle') ? (
+                ) : activeStoryId === 'bottle-that-waited' && objectPopup.name?.toLowerCase().includes('bottle') ? (
                   <BottleObject size="medium" className="pointer-events-none" />
                 ) : objectPopup.icon}
               </div>
@@ -844,6 +876,7 @@ export default function App() {
 
                 {/* INTERACTIVE REFLECTION PANEL */}
                 <InteractivePanel
+                  activeStoryId={activeStoryId}
                   scene={currentScene}
                   selectedQuizAnswer={selectedQuizAnswers[currentSceneId]}
                   waterStep={waterStep}
@@ -1064,6 +1097,7 @@ export default function App() {
           <CareCertificateModal
             isOpen={showCareCertificateModal}
             onClose={() => setShowCareCertificateModal(false)}
+            storyId={activeStoryId}
             storyTitle={activeStoryObj.title}
           />
         )}
@@ -1093,6 +1127,8 @@ export default function App() {
           <StoryArcModal
             isOpen={showStoryArcModal}
             onClose={() => setShowStoryArcModal(false)}
+            storyId={activeStoryId}
+            storyTitle={activeStoryObj.title}
             currentScene={currentScene}
             scenes={currentStoryScenes}
             currentSentenceIndex={safeSentenceIndex}

@@ -2,19 +2,50 @@ import React, { useState } from 'react';
 import { Award, X, Sparkles, Printer } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+const STORY_CARE_PLEDGES = {
+  'dolly-midnight-adventure': {
+    icon: '🎀',
+    label: 'Everyday Toys & Dear Friends',
+    tip: 'I promise to take care of my toys, include everyone in playtime, and share warm kindness with every friend!',
+    quote: '“A small act of kindness can bring light and joy to lost friends everywhere.” ✨'
+  },
+  'secret-cave': {
+    icon: '🦊',
+    label: 'True Friendship & Forest Animals',
+    tip: 'I promise to stick by my friends through thick and thin, and never leave a friend behind when times get tricky!',
+    quote: '“A real friend doesn\'t leave you behind just because the adventure is waiting.” ❤️'
+  },
+  'curious-rocket': {
+    icon: '🚀',
+    label: 'Big Dreams & Kind Space Helpers',
+    tip: 'I promise to take brave small steps toward my dreams every day and help friends who need a guiding light!',
+    quote: '“Big dreams start with tiny brave steps every single day!” 🌟'
+  },
+  'bear-lost-pencil': {
+    icon: '✏️',
+    label: 'Sharing & Creative Teamwork',
+    tip: 'I promise to share my art supplies, say thank you to friends who help me, and create beautiful things together!',
+    quote: '“Creativity grows much brighter when shared with good friends.” 🎨'
+  },
+  'bottle-that-waited': {
+    icon: '💧',
+    label: 'Everyday Helpers & Clean Water',
+    tip: 'I promise to pack my bag carefully, keep my water bottle clean, and cherish the everyday things that care for me!',
+    quote: '“Take care of the things that take care of you!” 💧'
+  }
+};
+
 export default function CareCertificateModal({
   isOpen,
   onClose,
-  careItem = {
-    icon: '💖',
-    label: 'Everyday Helpers & Friends',
-    tip: 'I promise to take care of my friends, share my toys, and treat every living creature with kindness!'
-  },
+  storyId = 'bottle-that-waited',
   storyTitle = "Storyverse Reading Adventure"
 }) {
   const [explorerName, setExplorerName] = useState('Super Story Explorer');
 
   if (!isOpen) return null;
+
+  const pledge = STORY_CARE_PLEDGES[storyId] || STORY_CARE_PLEDGES['bottle-that-waited'];
 
   const handlePrint = () => {
     confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
@@ -38,7 +69,7 @@ export default function CareCertificateModal({
             Care Champion Certificate
           </h2>
           <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mt-1">
-            Official Explorer Badge of Care
+            Official Explorer Badge of Care · {storyTitle}
           </p>
 
           <div className="my-6">
@@ -53,15 +84,15 @@ export default function CareCertificateModal({
           </div>
 
           <div className="bg-sky-100 border-2 border-sky-300 rounded-2xl p-4 my-4 flex items-center justify-center gap-3">
-            <span className="text-5xl">{careItem.icon}</span>
+            <span className="text-5xl">{pledge.icon}</span>
             <div className="text-left">
-              <h4 className="font-extrabold text-sky-950 text-base">Pledge to Care For: {careItem.label}</h4>
-              <p className="text-xs font-bold text-sky-800">{careItem.tip}</p>
+              <h4 className="font-extrabold text-sky-950 text-base">Pledge to Care For: {pledge.label}</h4>
+              <p className="text-xs font-bold text-sky-800">{pledge.tip}</p>
             </div>
           </div>
 
           <p className="text-xs font-extrabold text-amber-900 italic mt-4">
-            “Take care of the things that take care of you!” ❤️
+            {pledge.quote}
           </p>
         </div>
 

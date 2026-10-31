@@ -30,20 +30,40 @@ export const BEAR_STORY_SCENES = [
         name: "Benny Bear",
         icon: "🐻",
         label: "Benny Bear",
-        hint: "Tap Benny!",
-        dialogue: "“Wiggle wiggle! Let's draw something wonderful!” 🎨",
-        narratorReply: "Benny wiggles his cozy bear ears with joy!",
+        hint: "Tap Benny to hear him giggle!",
+        dialogue: "“Wiggle wiggle! Let's draw something wonderful with our golden pencil!” 🎨",
+        narratorReply: "Benny wiggles his cozy bear ears and smiles happily!",
         soundEffect: "pop"
       },
       {
         id: "pencil",
         name: "Golden Pencil",
         icon: "✏️",
-        label: "Golden Pencil",
-        hint: "Tap the pencil!",
-        dialogue: "Sparkle sparkle! Leaving a trail of rainbow doodles!",
-        narratorReply: "The magic pencil leaves golden starry dust wherever it moves.",
+        label: "Magic Pencil",
+        hint: "Tap the magic pencil!",
+        dialogue: "✨ Sparkle sparkle! Leaving a bright trail of rainbow doodles!",
+        narratorReply: "The magic golden pencil leaves shining stardust wherever it draws.",
         soundEffect: "sparkle"
+      },
+      {
+        id: "easel",
+        name: "Wooden Easel",
+        icon: "🎨",
+        label: "Rainbow Easel",
+        hint: "Tap the wooden easel!",
+        dialogue: "Look at the colorful stars, clouds, and rainbow swirls!",
+        narratorReply: "The easel holds Benny's most creative forest drawings.",
+        soundEffect: "sparkle"
+      },
+      {
+        id: "squirrel",
+        name: "Woodland Squirrel",
+        icon: "🐿️",
+        label: "Curious Squirrel",
+        hint: "Tap the little squirrel!",
+        dialogue: "“Chirp chirp! Your drawings make the whole forest smile, Benny!”",
+        narratorReply: "The fluffy squirrel watches happily from the mossy oak branch.",
+        soundEffect: "pop"
       }
     ]
   },
@@ -51,13 +71,13 @@ export const BEAR_STORY_SCENES = [
     id: 2,
     title: "The Forest Art Decision 🐻✏️",
     badge: null,
-    background: "forest-hill",
+    background: "forest-library",
     narration: "One afternoon, Benny met his forest friends: Penny the squirrel and Oliver the owl. 🐿️🦉 They were trying to build a colorful sign for the forest library, but they ran out of crayons! 😟 What should Benny do?",
-    instruction: "👀 Make a choice! Should Benny share his magic pencil?",
+    instruction: "👀 Make a choice! Should Benny share his golden magic pencil?",
     sentences: [
       {
         id: 1,
-        text: "One afternoon, Benny met his forest friends: Penny the squirrel and Oliver the owl.",
+        text: "One afternoon, Benny met his forest friends: Penny the squirrel and Oliver the owl. 🐿️🦉",
         speaker: "NARRATOR",
         screenState: { lighting: "bright", overlayEmoji: "🐿️", activeFocus: "full", animation: "bounce" },
         plotData: { emotionScore: 80, hydrationLevel: 90, quietnessIndex: 25, storyArcPoint: "Forest Friends" }
@@ -71,7 +91,7 @@ export const BEAR_STORY_SCENES = [
       }
     ],
     quiz: {
-      question: "✏️ Should Benny share his golden magic pencil?",
+      question: "✏️ Should Benny share his golden magic pencil with his friends?",
       options: [
         { id: "share_pencil", text: "Share the pencil! 🎨", isCorrect: true, feedback: "Hooray! Sharing the pencil makes rainbow doodles appear everywhere in the forest!" },
         { id: "keep_pencil", text: "Keep it hidden 🤫", isCorrect: false, feedback: "Benny smiles: 'Art is so much more fun when shared with good friends!'" }
@@ -80,13 +100,33 @@ export const BEAR_STORY_SCENES = [
     objects: [
       {
         id: "friends",
-        name: "Forest Friends",
+        name: "Penny & Oliver",
         icon: "🐿️🦉",
-        label: "Friends",
+        label: "Forest Friends",
         hint: "Tap the friends!",
-        dialogue: "“Thank you, Benny! You are so kind!” 💖",
-        narratorReply: "Penny and Oliver cheer happily!",
+        dialogue: "“Thank you, Benny! You are the sweetest friend in Cozy Forest!” 💖",
+        narratorReply: "Penny the squirrel and Oliver the owl cheer with joy!",
         soundEffect: "sparkle"
+      },
+      {
+        id: "sign",
+        name: "Forest Library Sign",
+        icon: "🪵",
+        label: "Library Sign",
+        hint: "Tap the wooden signboard!",
+        dialogue: "“Welcome to the Cozy Forest Library of Books & Stories!” 📚",
+        narratorReply: "The rustic wooden signboard is ready for colorful library books.",
+        soundEffect: "click"
+      },
+      {
+        id: "crayons",
+        name: "Colorful Crayons",
+        icon: "🖍️",
+        label: "Crayons on Stump",
+        hint: "Tap the crayons!",
+        dialogue: "Red, blue, yellow, and green! Everyone is ready to color together!",
+        narratorReply: "A collection of bright crayons rests on the wooden tree stump.",
+        soundEffect: "pop"
       }
     ]
   },
@@ -99,9 +139,9 @@ export const BEAR_STORY_SCENES = [
       icon: "🎨",
       desc: "Created a magical forest masterpiece together!"
     },
-    background: "forest-rescue",
+    background: "rainbow-bridge",
     narration: "Together, Benny and his friends drew a magnificent rainbow bridge connecting all the forest trees! 🌈✨ Everyone cheered and shared sweet honey berries under the glowing artwork. 💛 Creativity grows much brighter when shared with good friends!",
-    instruction: "🎨 Tap the rainbow bridge to see magic sparkles fill the forest!",
+    instruction: "🎨 Tap the rainbow bridge or honey berries to celebrate with Benny!",
     sentences: [
       {
         id: 1,
@@ -122,18 +162,38 @@ export const BEAR_STORY_SCENES = [
         text: "💛 Creativity grows much brighter when shared with good friends! 🎨🐻🌈",
         speaker: "NARRATOR",
         screenState: { lighting: "bright", overlayEmoji: "🎨", activeFocus: "full", animation: "sparkle" },
-        plotData: { emotionScore: 100, hydrationLevel: 100, quietnessIndex: 0, storyArcPoint: "Moral 1" }
+        plotData: { emotionScore: 100, hydrationLevel: 100, quietnessIndex: 0, storyArcPoint: "Sharing Moral" }
       }
     ],
     objects: [
       {
         id: "rainbow",
-        name: "Rainbow Bridge",
+        name: "Glowing Rainbow Bridge",
         icon: "🌈",
         label: "Rainbow Bridge",
-        hint: "Tap the rainbow!",
-        dialogue: "Glow glow! A magical rainbow glowing in Cozy Forest!",
-        narratorReply: "The rainbow artwork fills the forest with happiness!",
+        hint: "Tap the radiant rainbow!",
+        dialogue: "✨ Glow glow! A breathtaking rainbow bridge illuminating the whole forest canopy!",
+        narratorReply: "The magical rainbow bridge shimmers with warm pastel colors across the treetops.",
+        soundEffect: "sparkle"
+      },
+      {
+        id: "berries",
+        name: "Bowl of Honey Berries",
+        icon: "🍯🫐",
+        label: "Honey Berries",
+        hint: "Tap the honey berries!",
+        dialogue: "“Mmm! Sweet wild honey berries are the tastiest treat in the woods!” 🐻",
+        narratorReply: "Benny and his pals enjoy delicious forest berries under the sparkling lights.",
+        soundEffect: "pop"
+      },
+      {
+        id: "fairies",
+        name: "Forest Fairies",
+        icon: "🧚✨",
+        label: "Sparkle Fairies",
+        hint: "Tap the tiny fairies!",
+        dialogue: "“Hooray for Benny Bear! Hooray for sharing and true friendship!”",
+        narratorReply: "Tiny glowing forest fairies flutter with stardust over the celebration.",
         soundEffect: "sparkle"
       }
     ]

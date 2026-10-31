@@ -2,7 +2,96 @@ import React, { useState } from 'react';
 import { Activity, TrendingUp, Droplets, VolumeX, Sparkles, Navigation } from 'lucide-react';
 import { STORY_SCENES } from '../data/storyData';
 
+const STORY_METRICS = {
+  'dolly-midnight-adventure': {
+    metric1: {
+      name: "Lily's Wonder",
+      icon: '✨',
+      getDesc: (v) => v >= 80 ? '🌟 Full of Midnight Magic' : v >= 40 ? '🎀 Exploring the Bedroom' : '🧸 Button Eyes Peeking'
+    },
+    metric2: {
+      name: 'Midnight Courage',
+      icon: '🗝️',
+      getDesc: (v) => v >= 80 ? '🏰 Castle of Lost Toys Ready!' : v >= 40 ? '⛵ Sailing the Block Boat' : '🚪 Seeking the Golden Key'
+    },
+    metric3: {
+      name: 'House Serenity',
+      icon: '🌙',
+      getDesc: (v) => v >= 75 ? '🤫 Silent Midnight' : v >= 40 ? '✨ Gentle Whispers' : '⏰ Clock Ticking'
+    }
+  },
+  'secret-cave': {
+    metric1: {
+      name: 'Friendship Bond',
+      icon: '🦊',
+      getDesc: (v) => v >= 80 ? '🤝 Inseparable Best Pals' : v >= 40 ? '🐾 Exploring Forest Together' : '🌲 Sunny Woods Walk'
+    },
+    metric2: {
+      name: 'Bravery & Teamwork',
+      icon: '🧗',
+      getDesc: (v) => v >= 80 ? '💪 Unstoppable Team' : v >= 40 ? '🪵 Helping Stick Ready' : '⛰️ Steep Trail Ahead'
+    },
+    metric3: {
+      name: 'Cave Mystery Index',
+      icon: '💎',
+      getDesc: (v) => v >= 75 ? '✨ Glowing Amethyst Cave' : v >= 40 ? '🧭 Golden Arrow Trail' : '🍃 Whispering Trees'
+    }
+  },
+  'curious-rocket': {
+    metric1: {
+      name: 'Rocket Excitement',
+      icon: '🚀',
+      getDesc: (v) => v >= 80 ? '🤩 Cosmic Starlight Joy' : v >= 40 ? '✨ Cruising the Orbit' : '🛑 Launchpad Ready'
+    },
+    metric2: {
+      name: 'Booster Energy',
+      icon: '⚡',
+      getDesc: (v) => v >= 80 ? '🔥 Full Space Warp Speed!' : v >= 40 ? '🛸 Smooth Space Gliding' : '⛽ Thrusters Powered'
+    },
+    metric3: {
+      name: 'Galaxy Wonder',
+      icon: '🌌',
+      getDesc: (v) => v >= 75 ? '💫 Deep Sparkling Galaxy' : v >= 40 ? '☄️ Starry Comet Tail Glow' : '🌙 Smiling Moon View'
+    }
+  },
+  'bear-lost-pencil': {
+    metric1: {
+      name: "Benny's Happiness",
+      icon: '🐻',
+      getDesc: (v) => v >= 80 ? '🎨 Cheerful Forest Artist' : v >= 40 ? '🐾 Searching the Meadow' : '🥺 Looking for Pencil'
+    },
+    metric2: {
+      name: 'Rainbow Creativity',
+      icon: '🌈',
+      getDesc: (v) => v >= 80 ? '✨ Masterpiece Complete!' : v >= 40 ? '✏️ Drawing with Friends' : '📝 Sketching Rainbows'
+    },
+    metric3: {
+      name: 'Forest Harmony',
+      icon: '🌲',
+      getDesc: (v) => v >= 75 ? '🎉 Meadow Celebration' : v >= 40 ? '🤝 Caring Friends Helping' : '🌼 Quiet Forest Breeze'
+    }
+  },
+  'bottle-that-waited': {
+    metric1: {
+      name: 'Bottle Emotion',
+      icon: '💧',
+      getDesc: (v) => v >= 80 ? '😃 Happy & Loved' : v >= 40 ? '🥺 Hopeful / Waiting' : '💔 Lonely on Desk'
+    },
+    metric2: {
+      name: 'Hydration Level',
+      icon: '🚰',
+      getDesc: (v) => v >= 80 ? '💧 Fully Hydrated' : v >= 40 ? '💧 Half Full' : '🚰 Needs Water Refill!'
+    },
+    metric3: {
+      name: 'Classroom Quietness',
+      icon: '🤫',
+      getDesc: (v) => v >= 75 ? '🤫 Quiet Classroom' : v >= 40 ? '👣 Footsteps in Hall' : '🔔 Busy School Day'
+    }
+  }
+};
+
 export default function StoryPlotChart({
+  storyId = 'bottle-that-waited',
   currentScene,
   scenes = STORY_SCENES,
   currentSentenceIndex = 0,
@@ -14,6 +103,7 @@ export default function StoryPlotChart({
   const currentSentences = currentScene?.sentences || [];
   const currentSentence = currentSentences[currentSentenceIndex] || currentSentences[0];
   const plotData = currentSentence?.plotData || { emotionScore: 70, hydrationLevel: 70, quietnessIndex: 20 };
+  const storyConfig = STORY_METRICS[storyId] || STORY_METRICS['bottle-that-waited'];
 
   // Calculate SVG curve path for current scene sentences
   const width = 480;
@@ -268,12 +358,12 @@ export default function StoryPlotChart({
 
       {/* Dynamic Metric Gauges Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Gauge 1: Bottle Emotion */}
+        {/* Gauge 1 */}
         <div className="bg-slate-800/90 border border-sky-500/30 p-3 rounded-2xl flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs font-extrabold text-sky-300">
             <span className="flex items-center gap-1.5">
-              <TrendingUp className="w-4 h-4 text-sky-400" />
-              <span>Bottle Emotion</span>
+              <span className="text-sm">{storyConfig.metric1.icon}</span>
+              <span>{storyConfig.metric1.name}</span>
             </span>
             <span className="text-sky-200 font-black">{plotData.emotionScore}%</span>
           </div>
@@ -284,16 +374,16 @@ export default function StoryPlotChart({
             />
           </div>
           <span className="text-[10px] text-slate-400 font-semibold">
-            {plotData.emotionScore >= 80 ? '😃 Happy & Loved' : plotData.emotionScore >= 40 ? '🥺 Hopeful / Waiting' : '💔 Lonely & Left Behind'}
+            {storyConfig.metric1.getDesc(plotData.emotionScore)}
           </span>
         </div>
 
-        {/* Gauge 2: Hydration Meter */}
+        {/* Gauge 2 */}
         <div className="bg-slate-800/90 border border-teal-500/30 p-3 rounded-2xl flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs font-extrabold text-teal-300">
             <span className="flex items-center gap-1.5">
-              <Droplets className="w-4 h-4 text-teal-400" />
-              <span>Hydration Level</span>
+              <span className="text-sm">{storyConfig.metric2.icon}</span>
+              <span>{storyConfig.metric2.name}</span>
             </span>
             <span className="text-teal-200 font-black">{plotData.hydrationLevel}%</span>
           </div>
@@ -304,16 +394,16 @@ export default function StoryPlotChart({
             />
           </div>
           <span className="text-[10px] text-slate-400 font-semibold">
-            {plotData.hydrationLevel >= 80 ? '💧 Fully Hydrated' : plotData.hydrationLevel >= 40 ? '💧 Half Full' : '🚰 Needs Water Refill!'}
+            {storyConfig.metric2.getDesc(plotData.hydrationLevel)}
           </span>
         </div>
 
-        {/* Gauge 3: Classroom Silence / Quietness Index */}
+        {/* Gauge 3 */}
         <div className="bg-slate-800/90 border border-purple-500/30 p-3 rounded-2xl flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs font-extrabold text-purple-300">
             <span className="flex items-center gap-1.5">
-              <VolumeX className="w-4 h-4 text-purple-400" />
-              <span>Classroom Quietness</span>
+              <span className="text-sm">{storyConfig.metric3.icon}</span>
+              <span>{storyConfig.metric3.name}</span>
             </span>
             <span className="text-purple-200 font-black">{plotData.quietnessIndex}%</span>
           </div>
@@ -324,7 +414,7 @@ export default function StoryPlotChart({
             />
           </div>
           <span className="text-[10px] text-slate-400 font-semibold">
-            {plotData.quietnessIndex >= 75 ? '🤫 Quiet Classroom' : plotData.quietnessIndex >= 40 ? '👣 Footsteps in Hall' : '🔔 Busy School Day'}
+            {storyConfig.metric3.getDesc(plotData.quietnessIndex)}
           </span>
         </div>
       </div>

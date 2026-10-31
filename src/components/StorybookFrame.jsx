@@ -6,6 +6,7 @@ import MiloTobySprite from './MiloTobySprite';
 import LilyDollSprite from './LilyDollSprite';
 import RockyRocketSprite from './RockyRocketSprite';
 import BennyBearSprite from './BennyBearSprite';
+import AaravAndBottleScene from './AaravAndBottleScene';
 import ChalkboardCanvas from './ChalkboardCanvas';
 
 export default function StorybookFrame({
@@ -96,7 +97,7 @@ export default function StorybookFrame({
     unpacked_lunchbox: { name: 'Lunchbox', icon: '🍱' },
     unpacked_apple: { name: 'Apple', icon: '🍎' }
   };
-  const activeObject = scene.objects?.find(object => object.id === activeObjectId) || specialObjects[activeObjectId];
+  const activeObject = scene.objects?.find(object => object.id === activeObjectId) || (activeStoryId === 'bottle-that-waited' ? specialObjects[activeObjectId] : null);
   const getObjectAnimation = (object) => {
     if (object?.animation === 'rocket' || object?.soundEffect === 'rocket') return 'animate-rocket';
     if (object?.animation === 'wiggle') return 'animate-wiggle';
@@ -146,7 +147,7 @@ export default function StorybookFrame({
           <div className="relative w-full h-full rounded-[12px] overflow-hidden border-2 border-[#d9b477] shadow-xl bg-slate-900">
             {activeObject && (
               <div className="absolute inset-x-0 bottom-8 z-50 flex justify-center pointer-events-none">
-                {activeObjectId === 'bag' ? (
+                {activeObjectId === 'bag' && activeStoryId === 'bottle-that-waited' ? (
                   <div className="flex items-end gap-3 rounded-3xl border-4 border-amber-300 bg-amber-50/95 px-4 py-3 shadow-2xl">
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-1 text-[10px] font-black uppercase text-white shadow-md">
                       Bag opened!
@@ -160,7 +161,7 @@ export default function StorybookFrame({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-1 rounded-3xl border-4 border-amber-300 bg-white/95 px-5 py-3 shadow-2xl animate-gentle-bounce">
-                    {activeObject.visualType === 'cap' ? (
+                    {activeObject.visualType === 'cap' && activeStoryId === 'bottle-that-waited' ? (
                       <span className={`relative inline-block h-12 w-24 rounded-lg border-4 border-blue-950 bg-blue-700 shadow-md ${getObjectAnimation(activeObject)}`}>
                         <span className="absolute inset-x-2 top-2 border-t-4 border-blue-300" />
                         <span className="absolute inset-x-2 bottom-2 border-b-4 border-blue-900" />
@@ -176,27 +177,139 @@ export default function StorybookFrame({
               </div>
             )}
             {activeStoryId === 'curious-rocket' ? (
-              <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 flex flex-col justify-between p-4 overflow-hidden select-none">
-                {/* Floating Stars & Planets */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-10 left-10 text-3xl animate-spin-slow">⭐</div>
-                  <div className="absolute top-1/4 right-10 text-4xl animate-bounce">🪐</div>
-                  <div className="absolute bottom-1/3 left-1/4 text-2xl animate-float">✨</div>
-                  <div className="absolute top-1/2 left-1/3 text-3xl animate-pulse">🌙</div>
+              <div className="absolute inset-0 overflow-hidden select-none">
+                {/* REALISTIC HIGH-DEFINITION SCENE BACKGROUND */}
+                <div className="absolute inset-0">
+                  <img
+                    src={
+                      scene.id === 1 ? '/assets/rocket_scene_1.jpg' :
+                      scene.id === 2 ? '/assets/rocket_scene_2.jpg' :
+                      scene.id === 3 ? '/assets/rocket_scene_3.jpg' :
+                      '/assets/rocket_scene_4.jpg'
+                    }
+                    alt={scene.title || "The Little Rocket's Big Wish"}
+                    className="w-full h-full object-cover object-center transition-all duration-700 ease-out filter brightness-[1.02] contrast-[1.03]"
+                  />
+                  {/* Subtle Cinematic Starlight Vignette */}
+                  <div className="absolute inset-0 bg-radial-[circle_at_50%_35%] from-transparent via-black/10 to-black/35 pointer-events-none" />
                 </div>
 
-                {/* ROCKY ROCKET SPRITE */}
-                <div className="absolute bottom-8 inset-x-0 z-30 flex justify-center">
-                  <RockyRocketSprite
-                    mood={speaker === 'ROCKY' ? 'excited' : 'happy'}
-                    isFlying={scene.id >= 2}
-                    onTapRocket={() => onTapObject('rocky')}
-                  />
-                </div>
+                {/* SCENE 1 HOTSPOTS: Space Hill, Starlight Sky & Rocky */}
+                {scene.id === 1 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('star'); }}
+                      className="absolute top-[16%] left-[20%] z-20 cursor-pointer group"
+                      title="Tap Friendly Stars ⭐"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-100/90 hover:bg-amber-100 px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        ⭐ Starlight Sky
+                      </span>
+                    </div>
+
+                    {/* NATURAL ROCKY ROCKET INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rocky'); }}
+                      className="absolute bottom-[22%] right-[22%] z-25 cursor-pointer group"
+                      title="Tap Rocky Rocket 🚀"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-gradient-to-r from-rose-200 via-amber-100 to-rose-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-rose-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🚀 Tap Rocky Rocket ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 2 HOTSPOTS: Smiling Moon, Ringed Planet & Rocky */}
+                {scene.id === 2 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('moon'); }}
+                      className="absolute bottom-[24%] right-[16%] z-20 cursor-pointer group"
+                      title="Tap Crescent Moon 🌙"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3 py-1 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        🌙 Smiling Moon
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('planet'); }}
+                      className="absolute top-[14%] right-[16%] z-20 cursor-pointer group"
+                      title="Tap Ringed Planet 🪐"
+                    >
+                      <span className="text-xs font-black text-purple-950 bg-purple-200/95 hover:bg-purple-100 px-3 py-1 rounded-full shadow-xl border-2 border-purple-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        🪐 Ringed Planet
+                      </span>
+                    </div>
+
+                    {/* NATURAL ROCKY ROCKET INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rocky'); }}
+                      className="absolute top-[46%] left-[34%] z-25 cursor-pointer group"
+                      title="Tap Rocky Rocket 🚀"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-gradient-to-r from-rose-200 via-amber-100 to-rose-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-rose-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🚀 Zooming Rocky ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 3 HOTSPOTS: Starry Comet & Rocky */}
+                {scene.id === 3 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('starry'); }}
+                      className="absolute top-[44%] right-[22%] z-20 cursor-pointer group"
+                      title="Tap Starry Comet ☄️"
+                    >
+                      <span className="text-xs font-black text-sky-950 bg-sky-200/95 hover:bg-sky-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-sky-400 flex items-center gap-1.5 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        ☄️ Starry Comet ✨
+                      </span>
+                    </div>
+
+                    {/* NATURAL ROCKY ROCKET INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rocky'); }}
+                      className="absolute top-[40%] left-[22%] z-25 cursor-pointer group"
+                      title="Tap Rocky Rocket 🚀"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-gradient-to-r from-rose-200 via-amber-100 to-rose-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-rose-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🚀 Tap Rocky Rocket ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 4 HOTSPOTS: Space Friends Victory */}
+                {scene.id === 4 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rocky-star'); }}
+                      className="absolute top-[18%] left-[32%] z-20 cursor-pointer group"
+                      title="Tap Space Friends 🚀☄️"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        🚀 Best Space Friends 💛
+                      </span>
+                    </div>
+
+                    {/* NATURAL ROCKY ROCKET INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rocky'); }}
+                      className="absolute top-[42%] left-[44%] z-25 cursor-pointer group"
+                      title="Tap Rocky Rocket 🚀"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-gradient-to-r from-rose-200 via-amber-100 to-rose-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-rose-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🚀 Celebrating Rocky ✨
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 {/* SPEECH BUBBLE FOR ROCKY */}
                 {speaker === 'ROCKY' && currentSentence && (
-                  <div className="absolute top-14 left-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-rose-500 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 left-6 z-40 bg-[#fffdfa]/95 text-slate-900 border-3 border-rose-500 p-3 rounded-2xl shadow-2xl w-64 animate-bounce font-['Fredoka',sans-serif] backdrop-blur-xs">
                     <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 block mb-0.5">🚀 Rocky Rocket</span>
                     <p className="text-xs font-bold leading-snug text-slate-800">"{currentSentence.text}"</p>
                     <div className="absolute -bottom-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-rose-500" />
@@ -204,112 +317,412 @@ export default function StorybookFrame({
                 )}
               </div>
             ) : activeStoryId === 'bear-lost-pencil' ? (
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-200 via-emerald-100 to-emerald-600 flex flex-col justify-between p-4 overflow-hidden select-none">
-                {/* Forest Trees & Rainbow Doodles */}
-                <div className="absolute top-4 inset-x-4 flex justify-between text-4xl opacity-90 pointer-events-none">
-                  <span className="animate-wiggle">🌲</span>
-                  <span className="animate-pulse">🌈</span>
-                  <span className="animate-bounce">🎨</span>
-                  <span className="animate-wiggle">🌳</span>
+              <div className="absolute inset-0 overflow-hidden select-none">
+                {/* REALISTIC HIGH-RESOLUTION STORYBOOK SCENE BACKGROUND */}
+                <div className="absolute inset-0">
+                  <img
+                    src={
+                      scene.id === 2 ? '/assets/bear_scene_2.jpg' :
+                      scene.id === 3 ? '/assets/bear_scene_3.jpg' :
+                      '/assets/bear_scene_1.jpg'
+                    }
+                    alt={scene.title || "Benny Bear & The Magic Pencil"}
+                    className="w-full h-full object-cover object-center transition-all duration-700 ease-out filter brightness-[1.02] contrast-[1.03]"
+                  />
+                  {/* Subtle Cinematic Fairytale Lighting & Warm Forest Vignette */}
+                  <div className="absolute inset-0 bg-radial-[circle_at_50%_35%] from-transparent via-black/10 to-black/35 pointer-events-none" />
                 </div>
 
-                {/* BENNY BEAR SPRITE */}
-                <div className="absolute bottom-8 inset-x-0 z-30 flex justify-center">
-                  <BennyBearSprite
-                    mood={speaker === 'BENNY' ? 'excited' : 'happy'}
-                    hasPencil={true}
-                    onTapBear={() => onTapObject('benny')}
-                  />
-                </div>
+                {/* SCENE 1 HOTSPOTS: Rainbow Easel, Oak Squirrel & Benny Bear */}
+                {scene.id === 1 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('easel'); }}
+                      className="absolute top-[24%] left-[16%] z-20 cursor-pointer group"
+                      title="Tap Rainbow Easel 🎨"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🎨 Rainbow Easel ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('squirrel'); }}
+                      className="absolute top-[14%] left-[10%] z-20 cursor-pointer group"
+                      title="Tap Woodland Squirrel 🐿️"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-100/90 hover:bg-amber-100 px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        🐿️ Oak Squirrel
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('pencil'); }}
+                      className="absolute bottom-[44%] right-[42%] z-25 cursor-pointer group"
+                      title="Tap Golden Magic Pencil ✏️"
+                    >
+                      <span className="text-xs font-black text-yellow-950 bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-300 px-3 py-1 rounded-full shadow-xl border-2 border-yellow-400 flex items-center gap-1 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        ✏️ Magic Pencil ✨
+                      </span>
+                    </div>
+
+                    {/* NATURAL BENNY BEAR INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('benny'); }}
+                      className="absolute bottom-[20%] right-[14%] z-25 cursor-pointer group"
+                      title="Tap Benny Bear 🐻"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🐻 Tap Benny Bear ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 2 HOTSPOTS: Forest Library Sign, Crayons & Friends */}
+                {scene.id === 2 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('sign'); }}
+                      className="absolute top-[24%] left-[24%] z-20 cursor-pointer group"
+                      title="Tap Forest Library Sign 🪵"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🪵 Forest Library Sign 📚
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('crayons'); }}
+                      className="absolute bottom-[24%] left-[10%] z-20 cursor-pointer group"
+                      title="Tap Crayons 🖍️"
+                    >
+                      <span className="text-xs font-black text-emerald-950 bg-emerald-100/95 hover:bg-emerald-100 px-3 py-1 rounded-full shadow-lg border border-emerald-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        🖍️ Crayons on Stump
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('friends'); }}
+                      className="absolute bottom-[20%] left-[28%] z-20 cursor-pointer group"
+                      title="Tap Penny & Oliver 🐿️🦉"
+                    >
+                      <span className="text-xs font-black text-purple-950 bg-purple-100/95 hover:bg-purple-100 px-3 py-1 rounded-full shadow-xl border border-purple-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        🐿️🦉 Penny & Oliver 💖
+                      </span>
+                    </div>
+
+                    {/* NATURAL BENNY BEAR INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('benny'); }}
+                      className="absolute bottom-[20%] right-[14%] z-25 cursor-pointer group"
+                      title="Tap Benny Bear 🐻"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🐻 Tap Benny Bear ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 3 HOTSPOTS: Glowing Rainbow Bridge & Honey Berries */}
+                {scene.id === 3 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('rainbow'); }}
+                      className="absolute top-[14%] left-[32%] z-20 cursor-pointer group"
+                      title="Tap Glowing Rainbow Bridge 🌈"
+                    >
+                      <span className="text-xs font-black text-purple-950 bg-gradient-to-r from-pink-200 via-amber-200 to-sky-200 px-4 py-1.5 rounded-full shadow-2xl border-2 border-purple-400 flex items-center gap-1.5 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        🌈 Glowing Rainbow Bridge ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('berries'); }}
+                      className="absolute bottom-[20%] left-[46%] -translate-x-1/2 z-20 cursor-pointer group"
+                      title="Tap Honey Berries 🍯🫐"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-rose-200/95 hover:bg-rose-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-rose-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🍯 Bowl of Honey Berries 🫐
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('friends'); }}
+                      className="absolute bottom-[22%] left-[16%] z-20 cursor-pointer group"
+                      title="Tap Forest Friends 🐿️🐰"
+                    >
+                      <span className="text-xs font-black text-teal-950 bg-teal-100/95 hover:bg-teal-100 px-3 py-1 rounded-full shadow-lg border border-teal-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        🐿️🐰 Celebrating Friends
+                      </span>
+                    </div>
+
+                    {/* NATURAL BENNY BEAR INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('benny'); }}
+                      className="absolute bottom-[20%] right-[14%] z-25 cursor-pointer group"
+                      title="Tap Benny Bear 🐻"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🐻 Tap Benny Bear ✨
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 {/* SPEECH BUBBLE FOR BENNY */}
                 {speaker === 'BENNY' && currentSentence && (
-                  <div className="absolute top-14 left-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-emerald-500 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 right-6 z-40 bg-[#fffdfa]/95 text-slate-900 border-3 border-emerald-500 p-3 rounded-2xl shadow-2xl w-64 animate-bounce font-['Fredoka',sans-serif] backdrop-blur-xs">
                     <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 block mb-0.5">🐻 Benny Bear</span>
                     <p className="text-xs font-bold leading-snug text-slate-800">"{currentSentence.text}"</p>
-                    <div className="absolute -bottom-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-emerald-500" />
+                    <div className="absolute -bottom-3 right-16 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-emerald-500" />
                   </div>
                 )}
               </div>
             ) : activeStoryId === 'dolly-midnight-adventure' ? (
-              <div className="absolute inset-0 flex flex-col justify-between overflow-hidden select-none">
-                {/* Dynamic Backgrounds */}
-                {scene.background === 'toy-castle' ? (
-                  <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-indigo-900 to-pink-950 flex flex-col justify-between p-4">
-                    {/* Floating Stars & Balloons */}
-                    <div className="absolute top-6 inset-x-8 flex justify-between pointer-events-none">
-                      <span className="text-3xl animate-pulse filter drop-shadow-[0_0_12px_rgba(244,114,182,0.8)]">🎈</span>
-                      <span className="text-4xl animate-bounce filter drop-shadow-[0_0_15px_rgba(250,204,21,0.9)]">🏰</span>
-                      <span className="text-3xl animate-pulse filter drop-shadow-[0_0_12px_rgba(168,85,247,0.8)]">🧸</span>
+              <div className="absolute inset-0 overflow-hidden select-none">
+                {/* REALISTIC HIGH-RESOLUTION STORYBOOK SCENE BACKGROUND WITH LILY INTEGRATED */}
+                <div className="absolute inset-0">
+                  <img
+                    src={
+                      scene.id === 2 ? '/assets/dolly_scene_2.jpg' :
+                      scene.id === 3 ? '/assets/dolly_scene_3.jpg' :
+                      scene.id === 4 ? '/assets/dolly_scene_4.jpg' :
+                      scene.id === 5 ? '/assets/dolly_scene_5.jpg' :
+                      scene.id === 6 ? '/assets/dolly_scene_6.jpg' :
+                      '/assets/dolly_scene_1.jpg'
+                    }
+                    alt={scene.title || "Dolly's Midnight Adventure"}
+                    className="w-full h-full object-cover object-center transition-all duration-700 ease-out filter brightness-[1.02] contrast-[1.03]"
+                  />
+                  {/* Subtle Realistic Cinematic Lighting & Dust Motes Overlay */}
+                  <div className="absolute inset-0 bg-radial-[circle_at_50%_35%] from-transparent via-black/10 to-black/35 pointer-events-none" />
+                </div>
+
+                {/* SCENE 1 HOTSPOTS: Moonlit Bed, Tiny Backpack & Lily */}
+                {scene.id === 1 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('bed'); }}
+                      className="absolute top-[32%] right-[12%] z-20 cursor-pointer group"
+                      title="Tap Moonlit Bed 🛏️"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-amber-100/90 hover:bg-amber-100 px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        🛏️ Moonlit Bed
+                      </span>
                     </div>
-                    {/* Lost Toys Room Banner */}
-                    <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-pink-500/40 via-purple-400/20 to-transparent border-t border-pink-300/40 backdrop-blur-xs flex items-center justify-center gap-2">
-                      <span className="text-2xl animate-bounce">🧸</span>
-                      <span className="text-2xl animate-spin-slow">🪀</span>
-                      <span className="text-xs font-black text-pink-200 uppercase tracking-widest bg-purple-950/70 px-3.5 py-1 rounded-full border border-pink-400/40 animate-pulse">🏰 Castle of Lost Toys</span>
-                      <span className="text-2xl animate-bounce">🎈</span>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('backpack'); }}
+                      className="absolute bottom-[22%] left-[24%] z-20 cursor-pointer group"
+                      title="Tap Adventure Backpack 🎒"
+                    >
+                      <span className="text-xs font-black text-purple-950 bg-purple-200/95 hover:bg-purple-100 px-3 py-1 rounded-full shadow-xl border-2 border-purple-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🎒 Adventure Backpack ✨
+                      </span>
                     </div>
-                  </div>
-                ) : scene.background === 'forest-teacup' || scene.background === 'forest-river' ? (
-                  <div className="absolute inset-0 bg-gradient-to-b from-purple-900 via-pink-200 to-purple-600 flex flex-col justify-between p-4">
-                    {/* Magical Glowing Flowers & Floating Stars */}
-                    <div className="absolute top-4 inset-x-4 flex justify-between text-3xl opacity-90 pointer-events-none">
-                      <span className="animate-pulse">🌸</span>
-                      <span className="animate-bounce">✨</span>
-                      <span className="animate-float">🌸</span>
-                      <span className="animate-spin-slow">⭐</span>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[22%] left-[34%] z-25 cursor-pointer group"
+                      title="Tap Lily the Doll 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Tap Lily Doll ✨
+                      </span>
                     </div>
-                    {/* Teacup in Scene 3 */}
-                    {scene.id === 3 && (
-                      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                        <span className="text-6xl animate-pulse filter drop-shadow-xl">☕</span>
-                        <span className="text-xs font-black text-purple-950 bg-pink-200 px-2.5 py-0.5 rounded-full border border-purple-400 mt-1">🐰 Teacup Bunny</span>
-                      </div>
-                    )}
-                    {/* River & Toy Boat in Scene 4 */}
-                    {scene.id === 4 && (
-                      <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-cyan-500/60 via-blue-400/40 to-transparent border-t border-cyan-300 flex items-center justify-center">
-                        <span className="text-xs font-black text-cyan-950 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-400 animate-pulse">⛵ Toy Block Boat Sailing</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* Bedroom Night / Sunrise View */
-                  <div className={`absolute inset-0 transition-all duration-700 ${scene.background === 'bedroom-sunrise'
-                      ? 'bg-gradient-to-b from-amber-200 via-rose-100 to-amber-100'
-                      : 'bg-gradient-to-b from-indigo-950 via-slate-900 to-indigo-900'
-                    } flex flex-col justify-between p-4`}>
-                    {/* Moon or Sun */}
-                    <div className="absolute top-4 right-6 pointer-events-none">
-                      {scene.background === 'bedroom-sunrise' ? (
-                        <span className="text-5xl animate-spin-slow">🌅</span>
-                      ) : (
-                        <span className="text-4xl animate-pulse filter drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]">🌙</span>
-                      )}
-                    </div>
-                    {/* Mysterious Door if scene 2 */}
-                    {scene.id === 2 && (
-                      <div className="absolute bottom-16 right-10 bg-amber-400/90 text-amber-950 font-black text-xs px-3.5 py-1.5 rounded-full border-2 border-amber-200 shadow-xl animate-bounce flex items-center gap-1.5">
-                        <span>🚪 Glowing Door</span>
-                        <span className="text-base">✨</span>
-                      </div>
-                    )}
-                  </div>
+                  </>
                 )}
 
-                {/* LILY DOLL SPRITE */}
-                <div className="absolute bottom-8 inset-x-0 z-30 flex justify-center">
-                  <LilyDollSprite
-                    mood={speaker === 'LILY' ? 'excited' : 'happy'}
-                    hasKey={scene.id >= 2}
-                    isSailing={scene.id === 4}
-                    onTapLily={() => onTapObject('lily')}
-                  />
-                </div>
+                {/* SCENE 2 HOTSPOTS: Golden Key, Glowing Fairy Door & Lily */}
+                {scene.id === 2 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('door'); }}
+                      className="absolute top-[42%] left-[28%] z-20 cursor-pointer group"
+                      title="Tap Glowing Door 🚪"
+                    >
+                      <span className="text-[11px] font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3 py-1 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🚪 Fairy Door ✨
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('key'); }}
+                      className="absolute bottom-[22%] right-[22%] z-20 cursor-pointer group"
+                      title="Tap Golden Key 🗝️"
+                    >
+                      <span className="text-[11px] font-black text-yellow-950 bg-yellow-300/95 hover:bg-yellow-200 px-3 py-1 rounded-full shadow-xl border-2 border-yellow-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        🗝️ Golden Key ✨
+                      </span>
+                    </div>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[22%] left-[16%] z-25 cursor-pointer group"
+                      title="Tap Lily the Doll 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Tap Lily Doll ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 3 HOTSPOTS: Giant Teacup, Rescued Bunny & Lily */}
+                {scene.id === 3 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('teacup'); }}
+                      className="absolute top-[52%] right-[16%] z-20 cursor-pointer group"
+                      title="Tap Teacup ☕"
+                    >
+                      <span className="text-[11px] font-black text-rose-950 bg-rose-100/90 hover:bg-rose-100 px-3 py-1 rounded-full shadow-lg border border-rose-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        ☕ Giant Teacup
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('bunny'); }}
+                      className="absolute top-[35%] left-[45%] z-20 cursor-pointer group"
+                      title="Tap Teacup Bunny 🐰"
+                    >
+                      <span className="text-[11px] font-black text-purple-950 bg-pink-200/95 hover:bg-pink-100 px-3 py-1 rounded-full shadow-xl border border-purple-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        🐰 Teacup Bunny
+                      </span>
+                    </div>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[22%] left-[16%] z-25 cursor-pointer group"
+                      title="Tap Lily the Doll 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Tap Lily Doll ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 4 HOTSPOTS: Toy Block Boat, Castle & Lily */}
+                {scene.id === 4 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('boat'); }}
+                      className="absolute bottom-[32%] left-[32%] z-20 cursor-pointer group"
+                      title="Tap Toy Block Boat ⛵"
+                    >
+                      <span className="text-[11px] font-black text-sky-950 bg-sky-200/95 hover:bg-sky-100 px-3 py-1 rounded-full shadow-xl border-2 border-sky-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        ⛵ Block Boat
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('castle'); }}
+                      className="absolute top-[28%] right-[22%] z-20 cursor-pointer group"
+                      title="Tap Toy Castle 🏰"
+                    >
+                      <span className="text-[11px] font-black text-amber-950 bg-amber-100/90 hover:bg-amber-100 px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🏰 Toy Castle
+                      </span>
+                    </div>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[38%] left-[28%] z-25 cursor-pointer group"
+                      title="Tap Lily Sailing 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Lily Sailing ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 5 HOTSPOTS: Teddy Bear, Yo-Yo, Balloons & Lily */}
+                {scene.id === 5 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('teddy'); }}
+                      className="absolute bottom-[30%] left-[8%] z-20 cursor-pointer group"
+                      title="Tap Teddy Bear 🧸"
+                    >
+                      <span className="text-[11px] font-black text-amber-950 bg-amber-100/95 hover:bg-amber-100 px-2.5 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        🧸 Teddy
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('yoyo'); }}
+                      className="absolute bottom-[24%] left-[28%] z-20 cursor-pointer group"
+                      title="Tap Yo-Yo 🪀"
+                    >
+                      <span className="text-[11px] font-black text-rose-950 bg-rose-100/95 hover:bg-rose-100 px-2.5 py-1 rounded-full shadow-lg border border-rose-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        🪀 Yo-Yo
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('balloon'); }}
+                      className="absolute top-[16%] left-[32%] z-20 cursor-pointer group"
+                      title="Tap Balloons 🎈"
+                    >
+                      <span className="text-[11px] font-black text-pink-950 bg-pink-100/95 hover:bg-pink-100 px-2.5 py-1 rounded-full shadow-lg border border-pink-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-float">
+                        🎈 Balloons
+                      </span>
+                    </div>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[22%] right-[36%] z-25 cursor-pointer group"
+                      title="Tap Lily the Doll 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Tap Lily Doll ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENE 6 HOTSPOTS: Button Eyes, Morning Sun & Lily */}
+                {scene.id === 6 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('sun'); }}
+                      className="absolute top-[22%] left-[22%] z-20 cursor-pointer group"
+                      title="Tap Morning Sun 🌅"
+                    >
+                      <span className="text-[11px] font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3 py-1 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        🌅 Morning Sun
+                      </span>
+                    </div>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('eyes'); }}
+                      className="absolute bottom-[24%] right-[24%] z-20 cursor-pointer group"
+                      title="Tap Button Eyes 👀"
+                    >
+                      <span className="text-[11px] font-black text-purple-950 bg-purple-100/95 hover:bg-purple-100 px-3 py-1 rounded-full shadow-xl border border-purple-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-bounce">
+                        ✨ Button Eyes Sparkle
+                      </span>
+                    </div>
+
+                    {/* NATURAL LILY DOLL INTERACTIVE HOTSPOT */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lily'); }}
+                      className="absolute bottom-[22%] left-[30%] z-25 cursor-pointer group"
+                      title="Tap Lily the Doll 🎀"
+                    >
+                      <span className="text-xs font-black text-pink-950 bg-gradient-to-r from-pink-200 via-rose-100 to-pink-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-pink-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🎀 Tap Lily Doll ✨
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 {/* SPEECH BUBBLE FOR LILY */}
                 {speaker === 'LILY' && currentSentence && (
-                  <div className="absolute top-14 left-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-pink-500 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 left-6 z-40 bg-[#fffdfa]/95 text-slate-900 border-3 border-pink-500 p-3 rounded-2xl shadow-2xl w-64 animate-bounce font-['Fredoka',sans-serif] backdrop-blur-xs">
                     <span className="text-[10px] font-black uppercase tracking-wider text-pink-800 block mb-0.5">🎀 Lily the Doll</span>
                     <p className="text-xs font-bold leading-snug text-slate-800">"{currentSentence.text}"</p>
                     <div className="absolute -bottom-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-pink-500" />
@@ -318,7 +731,7 @@ export default function StorybookFrame({
 
                 {/* SPEECH BUBBLE FOR GIRL OR RABBIT */}
                 {(speaker === 'GIRL' || speaker === 'RABBIT') && currentSentence && (
-                  <div className="absolute top-14 right-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-purple-400 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 right-6 z-40 bg-[#fffdfa]/95 text-slate-900 border-3 border-purple-400 p-3 rounded-2xl shadow-2xl w-64 animate-bounce font-['Fredoka',sans-serif] backdrop-blur-xs">
                     <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 block mb-0.5">
                       {speaker === 'GIRL' ? '👧 Little Girl' : '🐰 Teacup Rabbit'}
                     </span>
@@ -328,73 +741,197 @@ export default function StorybookFrame({
                 )}
               </div>
             ) : activeStoryId === 'secret-cave' ? (
-              <div className="absolute inset-0 flex flex-col justify-between overflow-hidden">
-                {/* Dynamic Background Gradient & Scene Art */}
-                {scene.background === 'cave-glowing' || scene.background === 'cave-lake-night' ? (
-                  <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 flex flex-col justify-between p-4">
-                    {/* Glowing Wall Crystals */}
-                    <div className="absolute top-8 inset-x-8 flex justify-between pointer-events-none">
-                      <span className="text-3xl animate-pulse filter drop-shadow-[0_0_12px_rgba(168,85,247,0.8)]">💎</span>
-                      <span className="text-4xl animate-bounce filter drop-shadow-[0_0_15px_rgba(56,189,248,0.9)]">✨</span>
-                      <span className="text-3xl animate-pulse filter drop-shadow-[0_0_12px_rgba(236,72,153,0.8)]">💎</span>
+              <div className="absolute inset-0 overflow-hidden select-none">
+                {/* REALISTIC HIGH-DEFINITION SCENE BACKGROUND WITH MILO & TOBY INTEGRATED */}
+                <div className="absolute inset-0">
+                  <img
+                    src={
+                      scene.id >= 6
+                        ? '/assets/cave_scene_3.jpg'
+                        : scene.id >= 3
+                        ? '/assets/cave_scene_2.jpg'
+                        : '/assets/cave_scene_1.jpg'
+                    }
+                    alt={scene.title || "The Secret Cave"}
+                    className="w-full h-full object-cover object-center transition-all duration-700 ease-out filter brightness-[1.02] contrast-[1.03]"
+                  />
+                  {/* Subtle Cinematic Vignette */}
+                  <div className="absolute inset-0 bg-radial-[circle_at_50%_40%] from-transparent via-black/10 to-black/35 pointer-events-none" />
+                </div>
+
+                {/* SCENES 1 & 2: Sunny Forest Path & Golden Arrow */}
+                {scene.id <= 2 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('tree'); }}
+                      className="absolute top-[28%] right-[16%] z-20 cursor-pointer group"
+                      title="Tap Giant Oak Tree 🌲"
+                    >
+                      <span className="text-xs font-black text-emerald-950 bg-emerald-100/90 hover:bg-emerald-100 px-3 py-1 rounded-full shadow-lg border border-emerald-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        🌲 Giant Oak
+                      </span>
                     </div>
-                    {/* Dancing Fireflies */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/4 left-1/5 text-2xl animate-float filter drop-shadow-[0_0_10px_rgba(250,204,21,1)]">✨</div>
-                      <div className="absolute top-1/3 right-1/4 text-xl animate-float-slow filter drop-shadow-[0_0_10px_rgba(250,204,21,1)]">✨</div>
-                      <div className="absolute bottom-1/3 left-1/3 text-2xl animate-bounce filter drop-shadow-[0_0_10px_rgba(250,204,21,1)]">✨</div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('flowers'); }}
+                      className="absolute bottom-[18%] left-[6%] z-20 cursor-pointer group"
+                      title="Tap Wildflowers 🌸"
+                    >
+                      <span className="text-xs font-black text-rose-950 bg-rose-100/90 hover:bg-rose-100 px-3 py-1 rounded-full shadow-lg border border-rose-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110">
+                        🌸 Bluebells
+                      </span>
                     </div>
-                    {/* Glowing Lake at Bottom */}
-                    <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-sky-500/40 via-cyan-400/20 to-transparent border-t border-cyan-300/40 backdrop-blur-xs flex items-center justify-center">
-                      <span className="text-xs font-black text-cyan-200 uppercase tracking-widest bg-cyan-950/70 px-3.5 py-1 rounded-full border border-cyan-400/40 animate-pulse">🌊 Glowing Underground Lake</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-b from-sky-300 via-emerald-100 to-emerald-600 flex flex-col justify-between p-4">
-                    {/* Forest Canopy Trees */}
-                    <div className="absolute top-2 inset-x-4 flex justify-between text-4xl opacity-80 pointer-events-none">
-                      <span className="animate-wiggle">🌲</span>
-                      <span className="animate-pulse">🌳</span>
-                      <span className="animate-wiggle">🌲</span>
-                      <span className="animate-pulse">🌳</span>
-                    </div>
-                    {/* Sun & Clouds */}
-                    <div className="absolute top-4 left-6 flex items-center gap-2 pointer-events-none">
-                      <span className="text-4xl animate-spin-slow">☀️</span>
-                      <span className="text-2xl animate-float opacity-90">☁️</span>
-                    </div>
-                    {/* Golden Arrow on Tree if scene 2 */}
+
+                    {/* Scene 2: Golden Arrow on Tree */}
                     {scene.id === 2 && (
-                      <div className="absolute top-1/3 left-1/3 bg-amber-400/90 text-amber-950 font-black text-xs px-3.5 py-1.5 rounded-full border-2 border-amber-200 shadow-xl animate-bounce flex items-center gap-1.5">
-                        <span>🧭 Golden Arrow</span>
-                        <span className="text-base">➡️</span>
+                      <div
+                        onClick={(e) => { e.stopPropagation(); onTapObject('arrow'); }}
+                        className="absolute top-[42%] right-[22%] z-25 cursor-pointer group"
+                        title="Tap Golden Arrow 🧭"
+                      >
+                        <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                          🧭 Golden Arrow ✨
+                        </span>
                       </div>
                     )}
-                    {/* Steep Hill if scene 3 */}
-                    {scene.id === 3 && (
-                      <div className="absolute bottom-0 right-0 w-1/2 h-40 bg-emerald-800/60 rounded-tl-[100px] border-t-4 border-emerald-400 flex items-center justify-center">
-                        <span className="text-xs font-black text-amber-100 bg-emerald-950/70 px-3.5 py-1 rounded-full border border-emerald-400/50">⛰️ Steep Hill</span>
-                      </div>
-                    )}
-                  </div>
+
+                    {/* NATURAL MILO & TOBY INTERACTIVE HOTSPOTS */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('milo'); }}
+                      className="absolute bottom-[22%] left-[28%] z-25 cursor-pointer group"
+                      title="Tap Milo the Fox 🦊"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🦊 Tap Milo ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('toby'); }}
+                      className="absolute bottom-[22%] left-[44%] z-25 cursor-pointer group"
+                      title="Tap Toby the Rabbit 🐰"
+                    >
+                      <span className="text-xs font-black text-sky-950 bg-sky-200/95 hover:bg-sky-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-sky-400 flex items-center gap-1.5 backdrop-blur-xs animate-gentle-bounce group-hover:scale-110">
+                        🐰 Tap Toby ✨
+                      </span>
+                    </div>
+                  </>
                 )}
 
-                {/* MILO & TOBY CARTOON SPRITES */}
-                <div className="absolute bottom-8 inset-x-0 z-30 flex justify-center">
-                  <MiloTobySprite
-                    miloMood={speaker === 'MILO' ? 'excited' : scene.id === 4 || scene.id === 5 ? 'determined' : 'happy'}
-                    tobyMood={scene.id === 4 ? 'trapped' : scene.id === 5 ? 'rescued' : 'happy'}
-                    isTrapped={scene.id === 4}
-                    isRescued={scene.id === 5}
-                    isClimbing={scene.id === 3}
-                    onTapMilo={() => onTapObject('milo')}
-                    onTapToby={() => onTapObject('toby')}
-                  />
-                </div>
+                {/* SCENES 3, 4, 5: Steep Mountain Trail & Stone Rescue */}
+                {scene.id >= 3 && scene.id <= 5 && (
+                  <>
+                    {/* Scene 3: Steep Forest Trail */}
+                    {scene.id === 3 && (
+                      <div
+                        onClick={(e) => { e.stopPropagation(); onTapObject('hill'); }}
+                        className="absolute top-[22%] right-[16%] z-20 cursor-pointer group"
+                        title="Tap Steep Trail ⛰️"
+                      >
+                        <span className="text-xs font-black text-amber-950 bg-amber-100/95 hover:bg-amber-100 px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                          ⛰️ Steep Trail
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Scene 4: Trapped Rocks */}
+                    {scene.id >= 4 && (
+                      <div
+                        onClick={(e) => { e.stopPropagation(); onTapObject('rocks'); }}
+                        className="absolute top-[18%] left-[28%] z-20 cursor-pointer group"
+                        title="Tap Rocks 🪨"
+                      >
+                        <span className="text-xs font-black text-slate-900 bg-slate-200/95 hover:bg-slate-100 px-3 py-1 rounded-full shadow-lg border border-slate-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                          🪨 Heavy Rocks
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Scene 5: Rescue Stick */}
+                    {scene.id >= 4 && (
+                      <div
+                        onClick={(e) => { e.stopPropagation(); onTapObject('stick'); }}
+                        className="absolute top-[40%] left-[45%] z-20 cursor-pointer group"
+                        title="Tap Rescue Stick 🪵"
+                      >
+                        <span className="text-xs font-black text-amber-950 bg-amber-200/95 hover:bg-amber-100 px-3 py-1 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                          🪵 Strong Stick
+                        </span>
+                      </div>
+                    )}
+
+                    {/* NATURAL MILO & TOBY INTERACTIVE HOTSPOTS */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('milo'); }}
+                      className="absolute bottom-[24%] left-[46%] z-25 cursor-pointer group"
+                      title="Tap Milo the Fox 🦊"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🦊 Milo Rescuing ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('toby'); }}
+                      className="absolute bottom-[22%] right-[22%] z-25 cursor-pointer group"
+                      title="Tap Toby the Rabbit 🐰"
+                    >
+                      <span className="text-xs font-black text-sky-950 bg-sky-200/95 hover:bg-sky-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-sky-400 flex items-center gap-1.5 backdrop-blur-xs animate-gentle-bounce group-hover:scale-110">
+                        🐰 Toby Rescued ✨
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {/* SCENES 6 & 7: Glowing Crystal Cave & Subterranean Discovery */}
+                {scene.id >= 6 && (
+                  <>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('crystals'); }}
+                      className="absolute top-[32%] right-[16%] z-20 cursor-pointer group"
+                      title="Tap Glowing Crystals 💎"
+                    >
+                      <span className="text-xs font-black text-purple-950 bg-purple-200/95 hover:bg-purple-100 px-3.5 py-1 rounded-full shadow-xl border-2 border-purple-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-pulse">
+                        💎 Amethyst Crystals ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('lake'); }}
+                      className="absolute top-[54%] left-[54%] z-20 cursor-pointer group"
+                      title="Tap Secret Cave Archway 🌊"
+                    >
+                      <span className="text-xs font-black text-cyan-950 bg-cyan-200/95 hover:bg-cyan-100 px-3.5 py-1 rounded-full shadow-xl border-2 border-cyan-400 flex items-center gap-1 backdrop-blur-xs transition-transform group-hover:scale-110 animate-gentle-bounce">
+                        ✨ Cave Archway
+                      </span>
+                    </div>
+
+                    {/* NATURAL MILO & TOBY INTERACTIVE HOTSPOTS */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('milo'); }}
+                      className="absolute bottom-[22%] left-[38%] z-25 cursor-pointer group"
+                      title="Tap Milo the Fox 🦊"
+                    >
+                      <span className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-amber-400 flex items-center gap-1.5 backdrop-blur-xs animate-bounce group-hover:scale-110">
+                        🦊 Tap Milo ✨
+                      </span>
+                    </div>
+
+                    <div
+                      onClick={(e) => { e.stopPropagation(); onTapObject('toby'); }}
+                      className="absolute bottom-[22%] right-[28%] z-25 cursor-pointer group"
+                      title="Tap Toby the Rabbit 🐰"
+                    >
+                      <span className="text-xs font-black text-sky-950 bg-sky-200/95 hover:bg-sky-100 px-3.5 py-1.5 rounded-full shadow-xl border-2 border-sky-400 flex items-center gap-1.5 backdrop-blur-xs animate-gentle-bounce group-hover:scale-110">
+                        🐰 Tap Toby ✨
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 {/* SPEECH BUBBLE FOR MILO */}
                 {speaker === 'MILO' && currentSentence && (
-                  <div className="absolute top-14 left-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-amber-500 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 left-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-amber-500 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
                     <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block mb-0.5">🦊 Milo the Fox</span>
                     <p className="text-xs font-bold leading-snug text-slate-800">"{currentSentence.text}"</p>
                     <div className="absolute -bottom-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-amber-500" />
@@ -403,7 +940,7 @@ export default function StorybookFrame({
 
                 {/* SPEECH BUBBLE FOR TOBY */}
                 {speaker === 'TOBY' && currentSentence && (
-                  <div className="absolute top-14 right-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-sky-400 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
+                  <div className="absolute top-10 right-6 z-40 bg-[#fffdfa] text-slate-900 border-3 border-sky-400 p-3 rounded-2xl shadow-2xl w-60 animate-bounce font-['Fredoka',sans-serif]">
                     <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block mb-0.5">🐰 Toby the Rabbit</span>
                     <p className="text-xs font-bold leading-snug text-slate-800">"{currentSentence.text}"</p>
                     <div className="absolute -bottom-3 right-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-sky-400" />
@@ -411,100 +948,16 @@ export default function StorybookFrame({
                 )}
               </div>
             ) : scene.background !== 'water-station' ? (
-              <div
-                className={`absolute inset-0 transition-transform duration-700 ease-out origin-center ${getCameraTransform()}`}
-              >
-                <img
-                  src="/aarav_empty_desk_classroom_bg.jpg"
-                  alt="Storybook Classroom Illustration"
-                  className={`w-full h-full object-cover object-center transition-all duration-700 ${getLightingStyles()}`}
-                />
-
-                {/* Ambient Storybook Lighting Overlays */}
-                {screenState.lighting === 'spotlight' && (
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_70%,transparent_25%,rgba(120,53,15,0.75)_80%)] pointer-events-none animate-pulse" />
-                )}
-                {(screenState.lighting === 'dusk' || screenState.lighting === 'twilight') && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-indigo-950/30 to-amber-900/40 pointer-events-none" />
-                )}
-                {screenState.lighting === 'door_open' && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-100/40 via-yellow-100/20 to-transparent pointer-events-none animate-pulse" />
-                )}
-
-                {/* SOFT NATURAL DESK SHADOW */}
-                <div className="absolute bottom-[16%] left-[28%] w-28 h-28 bg-amber-950/30 rounded-full blur-lg pointer-events-none z-20" />
-
-                {/* INTERACTIVE CLOCK HOTSPOT */}
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onTapObject('clock');
-                  }}
-                  className="absolute top-[15%] left-[45%] w-12 h-12 rounded-full cursor-pointer hover:scale-125 transition-transform z-20 flex items-center justify-center group"
-                  title="Tap Clock ⏰"
-                >
-                  <span className="text-xs opacity-90 group-hover:opacity-100 transition-opacity bg-amber-100/90 text-amber-950 px-2 py-0.5 rounded-full font-bold shadow-md border border-amber-300 flex items-center gap-1">⏰ Tap</span>
-                </div>
-
-                {/* INTERACTIVE WINDOW HOTSPOT */}
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onTapObject('window');
-                  }}
-                  className="absolute top-[10%] right-[20%] w-20 h-20 rounded-2xl cursor-pointer hover:bg-amber-100/20 transition-all z-20 flex items-center justify-center group"
-                  title="Tap Window ☀️"
-                >
-                  <span className="text-xs opacity-90 group-hover:opacity-100 transition-opacity bg-amber-100/90 text-amber-950 px-2 py-0.5 rounded-full font-bold shadow-md border border-amber-300 flex items-center gap-1">☀️ Sun</span>
-                </div>
-
-                {/* ANIMATED CARTOON BOTTLE SPRITE */}
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onTapObject('bottle');
-                  }}
-                  className="absolute bottom-[35%] left-[32%] z-30 transform hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-                  title="Tap Buddy Bottle 💧"
-                >
-                  <CartoonBottleSprite
-                    mood={screenState.bottleMood || bottleState}
-                    waterLevel={scene.id >= 8 ? 100 : scene.id >= 4 ? 40 : 80}
-                  />
-
-                  {/* STORYBOOK SPEECH BUBBLE FOR BOTTLE */}
-                  {speaker === 'BOTTLE' && currentSentence && (
-                    <div className="absolute -top-24 -left-12 z-40 bg-[#fffdfa] text-slate-900 border-3 border-sky-400 p-3 rounded-2xl shadow-2xl w-52 animate-gentle-bounce font-serif">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block mb-0.5 font-cinzel">Buddy Bottle</span>
-                      <p className="text-xs font-bold leading-snug text-slate-800 font-reading">"{currentSentence.text}"</p>
-                      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-sky-400" />
-                    </div>
-                  )}
-                </div>
-
-                {/* ANIMATED CARTOON AARAV SPRITE */}
-                {shouldShowAarav() && (
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onTapObject('aarav');
-                    }}
-                    className="absolute bottom-8 left-[16%] z-30 transition-all duration-700 animate-gentle-bounce cursor-pointer hover:scale-105 active:scale-95"
-                    title="Tap Aarav 👦"
-                  >
-                    <AaravSprite pose={getAaravPose()} />
-
-                    {/* STORYBOOK SPEECH BUBBLE FOR AARAV */}
-                    {speaker === 'AARAV' && currentSentence && (
-                      <div className="absolute -top-24 -left-8 z-40 bg-[#fffdfa] text-slate-900 border-3 border-amber-500 p-3 rounded-2xl shadow-2xl w-52 animate-bounce font-serif">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block mb-0.5 font-cinzel">👦 Aarav</span>
-                        <p className="text-xs font-bold leading-snug text-slate-800 font-reading">"{currentSentence.text}"</p>
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-amber-500" />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <AaravAndBottleScene
+                scene={scene}
+                currentSentence={currentSentence}
+                bottleState={bottleState}
+                waterLevel={scene.id >= 8 ? 100 : scene.id >= 4 ? 40 : 80}
+                speaker={speaker}
+                onTapObject={onTapObject}
+                getLightingStyles={getLightingStyles}
+                getCameraTransform={getCameraTransform}
+              />
             ) : (
               /* WATER REFILL STATION VIEW */
               <div className="absolute inset-0 bg-gradient-to-b from-sky-100 via-sky-200 to-teal-100 flex items-center justify-center gap-4 md:gap-8 p-4">
@@ -540,8 +993,8 @@ export default function StorybookFrame({
               </div>
             )}
 
-            {/* CHALKBOARD DRAWING EASEL OVERLAY */}
-            {scene.background !== 'water-station' && (
+            {/* CHALKBOARD DRAWING EASEL OVERLAY (Classroom story only) */}
+            {activeStoryId === 'bottle-that-waited' && scene.background !== 'water-station' && (
               <div className="absolute top-3 right-3 w-48 sm:w-56 h-20 sm:h-24 z-20">
                 {!showChalkboardDrawer ? (
                   <div
@@ -592,10 +1045,30 @@ export default function StorybookFrame({
               <div className="absolute bottom-2 inset-x-3 z-40 bg-white/95 border-2 border-[#e6d7bd] p-2 md:p-2.5 rounded-[18px] shadow-2xl backdrop-blur-md flex items-center justify-between gap-2.5 animate-fade-in pointer-events-none font-['Fredoka',sans-serif]">
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-base animate-bounce">
-                    {speaker === 'BOTTLE' ? '💧' : speaker === 'AARAV' ? '👦' : '🎙️'}
+                    {speaker === 'BOTTLE' ? '💧'
+                      : speaker === 'AARAV' ? '👦'
+                      : speaker === 'LILY' ? '🎀'
+                      : speaker === 'GIRL' ? '👧'
+                      : speaker === 'RABBIT' ? '🐰'
+                      : speaker === 'MILO' ? '🦊'
+                      : speaker === 'TOBY' ? '🐰'
+                      : speaker === 'ROCKY' ? '🚀'
+                      : speaker === 'COMET' ? '☄️'
+                      : speaker === 'BENNY' ? '🐻'
+                      : '📖'}
                   </span>
                   <span className="text-[10px] md:text-xs font-black uppercase tracking-wider text-[#172d50] bg-[#ffd84d] px-2 py-0.5 rounded-md border border-[#efbd24] shadow-2xs">
-                    {speaker === 'BOTTLE' ? 'Buddy' : speaker === 'AARAV' ? 'Aarav' : 'Narrator'}
+                    {speaker === 'BOTTLE' ? 'Buddy'
+                      : speaker === 'AARAV' ? 'Aarav'
+                      : speaker === 'LILY' ? 'Lily Doll'
+                      : speaker === 'GIRL' ? 'Little Girl'
+                      : speaker === 'RABBIT' ? 'Teacup Rabbit'
+                      : speaker === 'MILO' ? 'Milo'
+                      : speaker === 'TOBY' ? 'Toby'
+                      : speaker === 'ROCKY' ? 'Rocky'
+                      : speaker === 'COMET' ? 'Starry'
+                      : speaker === 'BENNY' ? 'Benny Bear'
+                      : 'Narrator'}
                   </span>
                 </div>
 

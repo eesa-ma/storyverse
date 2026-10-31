@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, X, ChevronRight, ChevronLeft, Volume2, Printer, RefreshCw, Award, BookOpen, Heart, Wand2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundFX } from '../services/soundEffects';
+import { narrator } from '../services/narratorService';
 
 const HEROES = [
   { id: 'pip', name: 'Pip the Space Pup', emoji: '🐶', color: 'from-amber-400 to-orange-500', trait: 'Brave & Curious' },
@@ -76,20 +77,15 @@ export default function StoryMakerModal({ isOpen, onClose }) {
   };
 
   const speakText = (text) => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
     if (isSpeaking) {
+      narrator.cancel();
       setIsSpeaking(false);
       return;
     }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.15;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+    narrator.speak(text, 'NARRATOR', () => {
+      setIsSpeaking(false);
+    });
   };
 
   const handlePrintCertificate = () => {
@@ -117,7 +113,7 @@ export default function StoryMakerModal({ isOpen, onClose }) {
           </div>
           <button
             onClick={() => {
-              if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+              narrator.cancel();
               onClose();
             }}
             className="w-9 h-9 rounded-full bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-sm cursor-pointer transition-colors"
